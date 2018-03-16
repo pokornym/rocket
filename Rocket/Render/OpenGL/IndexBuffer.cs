@@ -20,10 +20,9 @@ namespace Rocket.Render.OpenGL {
 		}
 
 		public void Draw(GeometricPrimitives gp, int start, int count) {
-			Bind();
 			if (start < 0 || start + count > ElementCount)
 				throw new IndexOutOfRangeException();
-			GL.DrawElements((PrimitiveType) gp, count, DrawElementsType.UnsignedInt, start);
+			Use(() => GL.DrawElements((PrimitiveType) gp, count, DrawElementsType.UnsignedInt, start));
 		}
 
 		protected override void BindElement() {
@@ -35,7 +34,7 @@ namespace Rocket.Render.OpenGL {
 			_vtx?.Unbind();
 			base.UnbindElement();
 		}
-		
+
 		public uint this[int idx] {
 			get {
 				if (idx < 0 || idx >= ElementCount)

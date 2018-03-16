@@ -13,7 +13,7 @@ namespace Rocket.Render.OpenGL {
 			set => _boundId = value;
 		}
 		public int VertexCount => Buffer.VertexCount;
-		
+
 		public VertexArray(VertexLayout layout, int count) {
 			Layout = layout;
 			Buffer = new VertexBuffer(count, layout.VertexSize);
@@ -42,10 +42,9 @@ namespace Rocket.Render.OpenGL {
 		}
 
 		public void Draw(GeometricPrimitives gp, int start, int count) {
-			Bind();
 			if (start < 0 || start + count > VertexCount)
 				throw new IndexOutOfRangeException();
-			GL.DrawArrays((PrimitiveType) gp, start, count);
+			Use(() => GL.DrawArrays((PrimitiveType) gp, start, count));
 		}
 
 		protected override void BindElement() {
@@ -102,7 +101,7 @@ namespace Rocket.Render.OpenGL {
 				_coder.ToBytes(value, Buffer.Stream);
 			}
 		}
-		
+
 		private sealed class VertexArrayEnumerator : IEnumerator<TVertex> {
 			private readonly VertexArray<TVertex> _array;
 			private int _index;

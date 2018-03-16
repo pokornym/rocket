@@ -20,18 +20,21 @@ namespace Rocket.Render {
 			set => _window.Title = value;
 		}
 		public event EventHandler OnUpdate;
+		public event EventHandler OnInitialize;
+		public event EventHandler OnUninitialize;
 		private readonly List<IFeature> _features = new List<IFeature>();
+		private readonly List<ILayer> _layers = new List<ILayer>();
 		private readonly GameWindow _window;
 
 		public RocketWindow(int w = 1024, int h = 720) {
-			_window = new GameWindow(w, h, new GraphicsMode(GraphicsMode.Default.ColorFormat, GraphicsMode.Default.Depth, GraphicsMode.Default.Stencil, 8), "Game");
-			_window.Load += (s, e) => Initialize();
+			_window = new GameWindow(w, h, new GraphicsMode(GraphicsMode.Default.ColorFormat, GraphicsMode.Default.Depth, GraphicsMode.Default.Stencil, 16), "Game");
+			_window.Load += (s, e) => OnInitialize?.Invoke(this, null);
 			_window.RenderFrame += (s, e) => {
 				Tesselate();
 				GlProtection.FailIfError();
 			};
 			_window.UpdateFrame += (s, e) => OnUpdate?.Invoke(this, null);
-			_window.Unload += (s, e) => Uninitialize();
+			_window.Unload += (s, e) => OnUninitialize?.Invoke(this, null);
 		}
 
 		public void Attach(IFeature f) {
@@ -44,13 +47,16 @@ namespace Rocket.Render {
 			f.Detach();
 		}
 
+		public void Add(ILayer l) {
+			l.Resize(_window.Width,_window.Height);
+			_layers.Add(l);
+		}
+		
+		public void Remove(ILayer l) => _layers.Remove(l);
+
 		public void Start(int fps, int ups) {
 			_window.Run(ups, fps);
 		}
-
-		private void Initialize() { }
-
-		private void Frame() { }
 
 		private void Tesselate() {
 			GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -58,14 +64,13 @@ namespace Rocket.Render {
 			foreach (IFeature f in _features)
 				f.Before();
 
-			Frame();
+			foreach (ILayer l in _layers)
+				l.Render();
 
 			foreach (IFeature f in _features)
 				f.After();
 
 			_window.SwapBuffers();
 		}
-
-		private void Uninitialize() { }
 	}
 }

@@ -5,7 +5,7 @@ namespace Rocket.Render.OpenGL {
 	internal class VertexBuffer : Buffer, IVertexCollection, IVertexRenderer {
 		public readonly int VertexSize;
 		public int VertexCount { get; }
-		
+
 		public VertexBuffer(int count, int size) : base(BufferTypes.Vertex, count * size) {
 			VertexCount = count;
 			VertexSize = size;
@@ -28,10 +28,9 @@ namespace Rocket.Render.OpenGL {
 		}
 
 		public void Draw(GeometricPrimitives gp, int start, int count) {
-			Bind();
 			if (start < 0 || start + count > VertexCount)
 				throw new IndexOutOfRangeException();
-			GL.DrawArrays((PrimitiveType) gp, start, count);
+			Use(() => GL.DrawArrays((PrimitiveType) gp, start, count));
 		}
 	}
 }

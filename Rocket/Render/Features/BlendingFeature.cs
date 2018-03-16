@@ -1,7 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 
 namespace Rocket.Render.Features {
-	public sealed class Blending : IFeature {
+	public sealed class BlendingFeature : IFeature {
 		public void Attach() {
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);

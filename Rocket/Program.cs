@@ -6,8 +6,8 @@ using System;
 namespace Rocket {
 	internal static class Program {
 		private static void Main(string[] args) {
-			RocketWindow window = new RocketWindow();
-			window.Start(30, 20);
+			RocketGame game = new RocketGame(args);
+			game.Start();
 		}
 	}
 }
