@@ -6,7 +6,6 @@ using OpenTK;
 namespace Rocket.World {
 	internal sealed class Universe : IEnumerable<WorldObject> {
 		private const float G_CONSTNAT = 5;
-		private const float PLANK_LENGTH = 1f;
 		private readonly List<WorldObject> _objects = new List<WorldObject>();
 
 		public void Add(WorldObject obj) {

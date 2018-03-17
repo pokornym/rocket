@@ -1,25 +1,37 @@
 ﻿using System;
+using System.Collections.Generic;
 using OpenTK;
 using Rocket.Render;
 
 namespace Rocket.World {
-	internal class WorldObject {
-		public Vector2 Position = Vector2.Zero;
+	internal abstract class WorldObject {
+		public Vector2 Position {
+			get => Transformation.Position;
+			set => Transformation.Position = value;
+		}
 		public Vector2 Velocity = Vector2.Zero;
 		public Vector2 Acceleration = Vector2.Zero;
-		public Matrix4 Transformation = Matrix4.Identity;
 		public float Mass = 1;
 		public readonly Collider Collider;
-		public readonly Model Model;
+		public readonly Transformation Transformation = new Transformation();
+		public IEnumerable<ModelHandle> Handles => _handels;
 		protected Universe Universe { get; private set; }
+		private readonly List<ModelHandle> _handels = new List<ModelHandle>();
 
-		public WorldObject(Model m, Collider col) {
-			Model = m ?? throw new ArgumentNullException(nameof(m));
+		public WorldObject(Collider col) {
 			Collider = col ?? throw new ArgumentNullException(nameof(col));
 		}
 
 		public virtual void Tick() { }
 
 		public virtual void OnCreation(Universe uni) => Universe = uni;
+
+		protected ModelHandle Attach(Model mod) {
+			ModelHandle handle = new ModelHandle(mod);
+			_handels.Add(handle);
+			return handle;
+		}
+
+		protected void Detach(ModelHandle handle) => _handels.Remove(handle);
 	}
 }

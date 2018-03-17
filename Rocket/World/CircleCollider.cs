@@ -3,9 +3,9 @@ using OpenTK;
 
 namespace Rocket.World {
 	internal sealed class CircleCollider : Collider {
-		public readonly int Radius;
+		public readonly float Radius;
 
-		public CircleCollider(int r) : base(1) => Radius = r;
+		public CircleCollider(float r) : base(1) => Radius = r;
 
 		protected override bool IsCollision(Vector2 aPos, Vector2 bPos, Collider bCol) {
 			if (bCol is CircleCollider circle)

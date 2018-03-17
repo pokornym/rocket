@@ -8,6 +8,7 @@ using Rocket.Render.Features;
 using Rocket.Render.Layers;
 using Rocket.Render.OpenGL;
 using Rocket.World;
+using Rocket.World.Objects;
 
 namespace Rocket {
 	internal sealed class RocketGame {
@@ -21,6 +22,7 @@ namespace Rocket {
 		private readonly Universe _universe = new Universe();
 		private SceneLayer _layer;
 		private Model[] _planets;
+		private Model[] _atmospheres;
 		private int _tick = Environment.TickCount;
 
 		public RocketGame(string[] args) {
@@ -38,7 +40,13 @@ namespace Rocket {
 
 		private void Initialize() {
 			_planets = new Model[] {
-				new CircleModel(_coder, PLANET_TRIANGLES, Color.Red)
+				new CircleModel(_coder, PLANET_TRIANGLES, Color.Green),
+				new CircleModel(_coder, PLANET_TRIANGLES, Color.Red),
+				new CircleModel(_coder, PLANET_TRIANGLES, Color.Orange),
+				new CircleModel(_coder, PLANET_TRIANGLES, Color.Yellow)
+			};
+			_atmospheres = new Model[] {
+				new CircleModel(_coder, PLANET_TRIANGLES, new Color(0, 165, 255, byte.MaxValue / 2)),
 			};
 
 			GlProgram program = new GlProgram(
@@ -48,10 +56,10 @@ namespace Rocket {
 			_layer = new SceneLayer(_universe, program, program.GetUniform("uModel"), program.GetUniform("uView"), program.GetUniform("uProjection"));
 			_window.Add(_layer);
 
-			_universe.Add(new WorldObject(_planets[0], new CircleCollider(15)) { Transformation = Matrix4.CreateScale(15), Position = new Vector2(50, 100), Mass = 1000 });
-			_universe.Add(new WorldObject(_planets[0], new CircleCollider(5)) { Transformation = Matrix4.CreateScale(5), Position = new Vector2(-50, -250), Mass = 5, Velocity = new Vector2(4f, 0) });
-			_universe.Add(new WorldObject(_planets[0], new CircleCollider(15)) { Transformation = Matrix4.CreateScale(15), Position = new Vector2(-100, -200), Mass = 15, Velocity = new Vector2(4f, 0) });
-			_universe.Add(new WorldObject(_planets[0], new CircleCollider(30)) { Transformation = Matrix4.CreateScale(30), Position = new Vector2(-150, -100), Mass = 30, Velocity = new Vector2(4f, 0) });
+			_universe.Add(new SpaceObject(15, 20, 1000, _planets[0], _atmospheres[0]) { Position = new Vector2(50, 100) });
+			_universe.Add(new SpaceObject(5, 8, 5, _planets[1], _atmospheres[0]) { Position = new Vector2(-50, -250), Velocity = new Vector2(4f, 0) });
+			_universe.Add(new SpaceObject(15, 16, 15, _planets[2], _atmospheres[0]) { Position = new Vector2(-100, -200), Velocity = new Vector2(4f, 0) });
+			_universe.Add(new SpaceObject(30, 38, 30, _planets[3], _atmospheres[0]) { Position = new Vector2(-150, -100), Velocity = new Vector2(4f, 0) });
 		}
 
 		private void Update() {

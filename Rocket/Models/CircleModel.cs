@@ -19,8 +19,9 @@ namespace Rocket.Models {
 			for (int i = 0; i < t; i++) {
 				Vector2 vec = new Vector2((float) Math.Cos(step * (i - 1)), (float) Math.Sin(step * (i - 1)));
 				_vertices[i + 1] = new Vertex(vec, c, vec);
-				_indices[i + 1] = (uint)(i + 1);
+				_indices[i + 1] = (uint) (i + 1);
 			}
+
 			_indices[t + 1] = 1;
 			Faces[0] = new Face(_indices, GeometricPrimitives.TriangleFan);
 		}
