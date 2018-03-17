@@ -1,7 +1,7 @@
 ﻿using System;
 using OpenTK;
 
-namespace Rocket.Scenery {
+namespace Rocket.Render {
 	public sealed class Camera {
 		public Vector2 Position {
 			get => _pos;

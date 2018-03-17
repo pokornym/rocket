@@ -1,11 +1,11 @@
 ﻿using System;
 using OpenTK;
 using Rocket.Render.OpenGL;
-using Rocket.Scenery;
+using Rocket.World;
 
 namespace Rocket.Render.Layers {
 	internal sealed class SceneLayer : ILayer {
-		public readonly Scene Scene;
+		public readonly Universe Universe;
 		public readonly Camera Camera = new Camera();
 		private Matrix4 _projection;
 		private readonly GlProgram _program;
@@ -13,8 +13,8 @@ namespace Rocket.Render.Layers {
 		private readonly Uniform _uView;
 		private readonly Uniform _uProjection;
 
-		public SceneLayer(Scene s,GlProgram prog, Uniform model, Uniform view, Uniform proj) {
-			Scene = s ?? throw new ArgumentNullException(nameof(s));
+		public SceneLayer(Universe s,GlProgram prog, Uniform model, Uniform view, Uniform proj) {
+			Universe = s ?? throw new ArgumentNullException(nameof(s));
 			_program = prog ?? throw new ArgumentNullException(nameof(prog));
 			_uModel = model ?? throw new ArgumentNullException(nameof(model));
 			_uView = view ?? throw new ArgumentNullException(nameof(view));
@@ -35,8 +35,8 @@ namespace Rocket.Render.Layers {
 			_uProjection.Set(_projection);
 			_uView.Set(Camera.View);
 			
-			foreach (SceneObject obj in Scene) {
-				_uModel.Set(obj.Transformation);
+			foreach (WorldObject obj in Universe) {
+				_uModel.Set(obj.Transformation * Matrix4.CreateTranslation(obj.Position.X, obj.Position.Y, 0));
 			
 				obj.Model.Draw();
 			}

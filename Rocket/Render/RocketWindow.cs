@@ -19,6 +19,8 @@ namespace Rocket.Render {
 			get => _window.Title;
 			set => _window.Title = value;
 		}
+		public float FPS => (float) _window.RenderFrequency;
+		public float UPS => (float) _window.UpdateFrequency;
 		public event EventHandler OnUpdate;
 		public event EventHandler OnInitialize;
 		public event EventHandler OnUninitialize;
@@ -35,6 +37,12 @@ namespace Rocket.Render {
 			};
 			_window.UpdateFrame += (s, e) => OnUpdate?.Invoke(this, null);
 			_window.Unload += (s, e) => OnUninitialize?.Invoke(this, null);
+			_window.Resize += (s, e) => {
+				foreach (ILayer layer in _layers) {
+					layer.Resize(_window.Width, _window.Height);
+					GL.Viewport(0,0,_window.Width, _window.Height);
+				}
+			};
 		}
 
 		public void Attach(IFeature f) {
@@ -48,10 +56,10 @@ namespace Rocket.Render {
 		}
 
 		public void Add(ILayer l) {
-			l.Resize(_window.Width,_window.Height);
+			l.Resize(_window.Width, _window.Height);
 			_layers.Add(l);
 		}
-		
+
 		public void Remove(ILayer l) => _layers.Remove(l);
 
 		public void Start(int fps, int ups) {
