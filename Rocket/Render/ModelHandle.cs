@@ -11,7 +11,7 @@ namespace Rocket.Render {
 			get => Transformation.Angle;
 			set => Transformation.Angle = value;
 		}
-		public float Scale {
+		public Vector2 Scale {
 			get => Transformation.Scale;
 			set => Transformation.Scale = value;
 		}

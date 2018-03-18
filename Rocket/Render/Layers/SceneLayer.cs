@@ -6,45 +6,32 @@ using Rocket.World;
 namespace Rocket.Render.Layers {
 	internal sealed class SceneLayer : ILayer {
 		public readonly Universe Universe;
-		public readonly Transformation Camera = new Transformation();
+		public readonly Camera Camera = new Camera();
 		private Matrix4 _projection;
-		private readonly GlProgram _program;
-		private readonly Uniform _uModel;
-		private readonly Uniform _uView;
-		private readonly Uniform _uProjection;
-
-		public SceneLayer(Universe s, GlProgram prog, Uniform model, Uniform view, Uniform proj) {
+		private readonly RenderHandle _ren;
+		public SceneLayer(Universe s, RenderHandle ren) {
 			Universe = s ?? throw new ArgumentNullException(nameof(s));
-			_program = prog ?? throw new ArgumentNullException(nameof(prog));
-			_uModel = model ?? throw new ArgumentNullException(nameof(model));
-			_uView = view ?? throw new ArgumentNullException(nameof(view));
-			_uProjection = proj ?? throw new ArgumentNullException(nameof(proj));
-			if (_uModel.Type.Type != PrimitiveTypes.Matrix || _uModel.Type.Dimension != 4)
-				throw new TypeMismatchException(new ShaderElementType(PrimitiveTypes.Matrix, 4), _uModel.Type);
-			if (_uView.Type.Type != PrimitiveTypes.Matrix || _uView.Type.Dimension != 4)
-				throw new TypeMismatchException(new ShaderElementType(PrimitiveTypes.Matrix, 4), _uView.Type);
-			if (_uProjection.Type.Type != PrimitiveTypes.Matrix || _uProjection.Type.Dimension != 4)
-				throw new TypeMismatchException(new ShaderElementType(PrimitiveTypes.Matrix, 4), _uProjection.Type);
+			_ren = ren ?? throw new ArgumentNullException(nameof(ren));
 		}
 
 		public void Resize(int w, int h) => _projection = Matrix4.CreateOrthographic(w, h, -100, 100);
 
 		public void Render() {
-			_program.Bind();
+			_ren.Program.Bind();
 
-			_uProjection.Set(_projection);
-			_uView.Set(Camera.Matrix);
+			_ren.SetProjection(_projection);
+			_ren.SetView(Camera.Matrix);
 
 			foreach (WorldObject obj in Universe) {
 				int l = 0;
 				foreach (ModelHandle h in obj.Handles) {
-					_uModel.Set((h.Transformation + obj.Transformation)*Matrix4.CreateTranslation(0, 0, -0.01f * l++));
+					_ren.SetModel((h.Transformation + obj.Transformation) * Matrix4.CreateTranslation(0, 0, -0.01f * l++));
 
 					h.Draw();
 				}
 			}
 
-			_program.Unbind();
+			_ren.Program.Unbind();
 		}
 	}
 }

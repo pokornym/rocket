@@ -27,6 +27,7 @@ namespace Rocket.Render {
 		public event EventHandler OnUninitialize;
 		public event EventHandler<Key> OnKeyDown;
 		public event EventHandler<Key> OnKeyUp;
+		public event EventHandler<float> OnWheel;
 		private readonly List<Key> _keys = new List<Key>();
 		private readonly List<IFeature> _features = new List<IFeature>();
 		private readonly List<ILayer> _layers = new List<ILayer>();
@@ -45,16 +46,23 @@ namespace Rocket.Render {
 			_window.Resize += (s, e) => {
 				foreach (ILayer layer in _layers) {
 					layer.Resize(_window.Width, _window.Height);
-					GL.Viewport(0,0,_window.Width, _window.Height);
+					GL.Viewport(0, 0, _window.Width, _window.Height);
 				}
 			};
 			_window.KeyDown += (s, e) => {
-				_keys.Add(e.Key);
+				if (!_keys.Contains(e.Key))
+					_keys.Add(e.Key);
 				OnKeyDown?.Invoke(this, e.Key);
 			};
 			_window.KeyUp += (s, e) => {
-				_keys.Remove(e.Key);
+				if (_keys.Contains(e.Key))
+					_keys.Remove(e.Key);
 				OnKeyUp?.Invoke(this, e.Key);
+			};
+			_window.MouseWheel += (s, e) => OnWheel?.Invoke(this, e.DeltaPrecise);
+			_window.FocusedChanged += (s, e) => {
+				if (!_window.Focused)
+					_keys.Clear();
 			};
 		}
 
@@ -69,7 +77,7 @@ namespace Rocket.Render {
 		}
 
 		public bool IsKey(Key k) => _keys.Contains(k);
-		
+
 		public void Add(ILayer l) {
 			l.Resize(_window.Width, _window.Height);
 			_layers.Add(l);

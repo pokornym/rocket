@@ -1,4 +1,5 @@
-﻿using Rocket.Render;
+﻿using OpenTK;
+using Rocket.Render;
 
 namespace Rocket.World.Objects {
 	internal sealed class SpaceObject : WorldObject {
@@ -8,9 +9,9 @@ namespace Rocket.World.Objects {
 		public SpaceObject(float r, float a, float m, Model body, Model atm) : base(new CircleCollider(r)) {
 			Mass = m;
 			_body = Attach(body);
-			_body.Transformation.Scale = r;
+			_body.Transformation.Scale = Vector2.One * r;
 			_atmosphere = Attach(atm);
-			_atmosphere.Transformation.Scale = r + a;
+			_atmosphere.Transformation.Scale = Vector2.One * (r + a);
 		}
 
 		public override bool Tick() {

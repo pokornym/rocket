@@ -11,13 +11,13 @@ namespace Rocket.Render {
 			}
 		}
 		public float Angle {
-			get => _angle % ((float) Math.PI * 2);
+			get => _angle;
 			set {
-				_angle = value;
+				_angle = value % ((float) Math.PI * 2);
 				ComputeMatrix();
 			}
 		}
-		public float Scale {
+		public Vector2 Scale {
 			get => _scale;
 			set {
 				_scale = value;
@@ -27,14 +27,25 @@ namespace Rocket.Render {
 		public Matrix4 Matrix { get; private set; }
 		private Vector2 _pos = Vector2.Zero;
 		private float _angle = 0;
-		private float _scale = 1;
+		private Vector2 _scale = Vector2.One;
 
 		public Transformation() {
 			ComputeMatrix();
 		}
 
-		private void ComputeMatrix() => Matrix = Matrix4.CreateScale(_scale) * Matrix4.CreateRotationZ(_angle) * Matrix4.CreateTranslation(_pos.X, _pos.Y, 0);
+		private void ComputeMatrix() {
+			Matrix =
+				Matrix4.CreateScale(_scale.X, _scale.Y, 0) *
+				Matrix4.CreateRotationZ(_angle) *
+				Matrix4.CreateTranslation(_pos.X, _pos.Y, 0);
+		}
 
-		public static Matrix4 operator +(Transformation a, Transformation b) => Matrix4.CreateScale(a._scale * b._scale) * Matrix4.CreateRotationZ(a._angle + b._angle) * Matrix4.CreateTranslation(a._pos.X + b._pos.X, a._pos.Y + b._pos.Y,0);
+		public static Matrix4 operator +(Transformation a, Transformation b) {
+			Vector2 scale = a._scale * b._scale;
+			return
+				Matrix4.CreateScale(scale.X, scale.Y, 0) *
+				Matrix4.CreateRotationZ(a._angle + b._angle) *
+				Matrix4.CreateTranslation(a._pos.X + b._pos.X, a._pos.Y + b._pos.Y, 0);
+		}
 	}
 }

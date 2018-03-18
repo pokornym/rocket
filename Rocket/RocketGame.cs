@@ -34,6 +34,7 @@ namespace Rocket {
 			_window.Attach(new DepthFeature());
 			_window.OnInitialize += (s, e) => Initialize();
 			_window.OnUpdate += (s, e) => Update();
+			_window.OnWheel += (s, e) => _layer.Camera.Zoom = Math.Max(Math.Min(_layer.Camera.Zoom + e * 0.1f, 3f), 0.2f);
 		}
 
 		public void Start() {
@@ -53,18 +54,19 @@ namespace Rocket {
 				new Shader(ShaderTypes.Vertex, File.ReadAllText(Path.Combine(SHADERS_DIR, "vertex.glsl"))),
 				new Shader(ShaderTypes.Fragment, File.ReadAllText(Path.Combine(SHADERS_DIR, "fragment.glsl")))
 			);
-			_layer = new SceneLayer(_universe, program, program.GetUniform("uModel"), program.GetUniform("uView"), program.GetUniform("uProjection"));
-			_window.Add(_layer);
 
 			_universe.Add(new SpaceObject(15, 20, 100000, _planets[0], _atmospheres[0]) { Position = new Vector2(0, 0) });
 			_universe.Add(new SpaceObject(5, 8, 50, _planets[1], _atmospheres[0]) { Position = new Vector2(-500, -500), Velocity = new Vector2(20f, 0) });
 			_universe.Add(_rocket = new RocketObject(30, 50, new RocketModel(_coder)) { Position = new Vector2(500, 500), Velocity = new Vector2(-25f, 0f) });
+
+			RenderHandle handle = new RenderHandle(program);
+			_layer = new SceneLayer(_universe, handle);
+			_window.Add(_layer);
+			_window.Add(new FuelLayer(_rocket, handle, new RectangleModel(_coder, Color.Red)));
 		}
 
 		private void Update() {
-			_universe.Tick();
-
-			 if (_window.IsKey(Key.A))
+			if (_window.IsKey(Key.A))
 				_rocket.MoveCCW(_window.IsKey(Key.W) ? 2f : 1f);
 			else if (_window.IsKey(Key.D))
 				_rocket.MoveCW(_window.IsKey(Key.W) ? 2f : 1f);
@@ -72,6 +74,10 @@ namespace Rocket {
 				_rocket.MoveForward(1f);
 			else
 				_rocket.StopMovement();
+
+			_universe.Tick();
+
+			_layer.Camera.Position = _rocket.Position;
 
 			if (_tick + 1000 <= Environment.TickCount) {
 				Debug.WriteLine($"{_window.FPS:F2} FPS, {_window.UPS:F2} UPS");
