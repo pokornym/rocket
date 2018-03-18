@@ -22,10 +22,10 @@ namespace Rocket.Render.Layers {
 			_ren.SetProjection(_projection);
 			_ren.SetView(Camera.Matrix);
 
+			int l = 0;
 			foreach (WorldObject obj in Universe) {
-				int l = 0;
 				foreach (ModelHandle h in obj.Handles) {
-					_ren.SetModel((h.Transformation + obj.Transformation) * Matrix4.CreateTranslation(0, 0, -0.01f * l++));
+					_ren.SetModel((h.Transformation + obj.Transformation) * Matrix4.CreateTranslation(0, 0, 0.01f * l++));
 
 					h.Draw();
 				}

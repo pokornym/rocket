@@ -6,6 +6,7 @@ namespace Rocket.World.Objects {
 	internal sealed class RocketObject : WorldObject {
 		private const float FUEL_MASS = 0.5f;
 		private const float FORCE = 2f;
+		private const float DRAG = 0.2f;
 
 		public float Fuel {
 			get => _fuel;
@@ -24,7 +25,7 @@ namespace Rocket.World.Objects {
 		public RocketObject(float s, float m, float f, Model r) : base(false, new Vector2(2f / 3, 1f)) {
 			_model = Attach(r);
 			_bMass = m;
-			Transformation.Scale = Vector2.One * s;
+			Scale = Vector2.One * s;
 			MaxFuel = Fuel = f;
 		}
 
@@ -41,23 +42,29 @@ namespace Rocket.World.Objects {
 		public override bool Tick() {
 			if (Velocity != Vector2.Zero) {
 				float target = (float) Math.Atan2(Velocity.Y, Velocity.X);
-				float start = Transformation.Angle + (float) Math.PI / 2;
+				float start = Angle + (float) Math.PI / 2;
 
 				if (target - start <= start - target)
-					Transformation.Angle += (target - start) / 3f;
+					Angle += (target - start) / 3f;
 				else
-					Transformation.Angle -= (start - target) / 3f;
+					Angle -= (start - target) / 3f;
 			}
 
 			float delta = _slz.GetDelta();
+			Vector2 acc = Vector2.Zero;
 			if (_engine != Vector2.Zero && _fuel > 0) {
 				float m = _engine.Length * delta;
 				m = Math.Min(m, _fuel);
-				Acceleration = _engine * m;
+				acc = _engine * m;
 				_fuel = Math.Max(_fuel - m, 0f);
-			} else
-				Acceleration = Vector2.Zero;
+			}
 
+			foreach (WorldObject obj in Universe) {
+				if (obj is SpaceObject s && s.AtmosphereBody.IsCollision(this))
+					acc += -Velocity * DRAG;
+			}
+
+			Acceleration = acc;
 			return base.Tick();
 		}
 

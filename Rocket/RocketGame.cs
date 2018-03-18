@@ -15,7 +15,7 @@ namespace Rocket {
 	internal sealed class RocketGame {
 		private const int FPS = 30;
 		private const int UPS = 30;
-		private const int PLANET_TRIANGLES = 8;
+		private const int PLANET_TRIANGLES = 16;
 		private const string SHADERS_DIR = "shaders";
 
 		private readonly RocketWindow _window;
@@ -30,11 +30,10 @@ namespace Rocket {
 		public RocketGame(string[] args) {
 			_window = new RocketWindow();
 			_window.Attach(new BlendingFeature());
-			_window.Attach(new TexturesFeature());
-			_window.Attach(new DepthFeature());
 			_window.OnInitialize += (s, e) => Initialize();
 			_window.OnUpdate += (s, e) => Update();
 			_window.OnWheel += (s, e) => _layer.Camera.Zoom = Math.Max(Math.Min(_layer.Camera.Zoom + e * 0.1f, 3f), 0.2f);
+			_window.Title = "Rocket";
 		}
 
 		public void Start() {
