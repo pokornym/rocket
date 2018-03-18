@@ -11,7 +11,7 @@ namespace Rocket.Render {
 			}
 		}
 		public float Angle {
-			get => _angle % ((float)Math.PI * 2);
+			get => _angle % ((float) Math.PI * 2);
 			set {
 				_angle = value;
 				ComputeMatrix();
@@ -33,10 +33,8 @@ namespace Rocket.Render {
 			ComputeMatrix();
 		}
 
-		private void ComputeMatrix() => Matrix = Matrix4.CreateTranslation(_pos.X, _pos.Y, 0) * Matrix4.CreateRotationZ(_angle) * Matrix4.CreateScale(_scale);
+		private void ComputeMatrix() => Matrix = Matrix4.CreateScale(_scale) * Matrix4.CreateRotationZ(_angle) * Matrix4.CreateTranslation(_pos.X, _pos.Y, 0);
 
-		public static implicit operator Matrix4(Transformation t) => t.Matrix;
-		
-		public static Matrix4 operator *(Transformation a, Transformation b) => a.Matrix * b.Matrix;
+		public static Matrix4 operator +(Transformation a, Transformation b) => Matrix4.CreateScale(a._scale * b._scale) * Matrix4.CreateRotationZ(a._angle + b._angle) * Matrix4.CreateTranslation(a._pos.X + b._pos.X, a._pos.Y + b._pos.Y,0);
 	}
 }

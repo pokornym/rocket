@@ -22,7 +22,7 @@ namespace Rocket.World {
 			Collider = col ?? throw new ArgumentNullException(nameof(col));
 		}
 
-		public virtual void Tick() { }
+		public virtual bool Tick() => true;
 
 		public virtual void OnCreation(Universe uni) => Universe = uni;
 

@@ -13,9 +13,10 @@ namespace Rocket.World.Objects {
 			_atmosphere.Transformation.Scale = r + a;
 		}
 
-		public override void Tick() {
-			_body.Transformation.Angle += 0.001f;
-			_atmosphere.Transformation.Angle -= 0.01f;
+		public override bool Tick() {
+			_body.Angle += 0.005f;
+			_atmosphere.Angle -= 0.01f;
+			return true;
 		}
 	}
 }

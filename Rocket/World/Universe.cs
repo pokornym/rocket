@@ -7,6 +7,7 @@ namespace Rocket.World {
 	internal sealed class Universe : IEnumerable<WorldObject> {
 		private const float G_CONSTNAT = 5;
 		private readonly List<WorldObject> _objects = new List<WorldObject>();
+		private readonly Stabilizer _stz = new Stabilizer();
 
 		public void Add(WorldObject obj) {
 			_objects.Add(obj);
@@ -16,8 +17,11 @@ namespace Rocket.World {
 		public void Remove(WorldObject obj) => _objects.Remove(obj);
 
 		public void Tick() {
-			foreach (WorldObject obj in _objects) {
-				obj.Tick();
+			float delta = _stz.GetDelta();
+			for (int i = _objects.Count - 1; i >= 0; i--) {
+				WorldObject obj = _objects[i];
+				if (!obj.Tick())
+					_objects.RemoveAt(i);
 
 				// Gravity
 				Vector2 accel = obj.Acceleration;
@@ -28,8 +32,8 @@ namespace Rocket.World {
 				}
 
 				// Dynamics
-				obj.Velocity += accel;
-				obj.Position += obj.Velocity;
+				obj.Velocity += accel * delta;
+				obj.Position += obj.Velocity * delta;
 			}
 		}
 

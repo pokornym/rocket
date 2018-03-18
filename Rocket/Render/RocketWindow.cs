@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Input;
 using Rocket.Render.OpenGL;
 
 namespace Rocket.Render {
@@ -24,12 +25,16 @@ namespace Rocket.Render {
 		public event EventHandler OnUpdate;
 		public event EventHandler OnInitialize;
 		public event EventHandler OnUninitialize;
+		public event EventHandler<Key> OnKeyDown;
+		public event EventHandler<Key> OnKeyUp;
+		private readonly List<Key> _keys = new List<Key>();
 		private readonly List<IFeature> _features = new List<IFeature>();
 		private readonly List<ILayer> _layers = new List<ILayer>();
 		private readonly GameWindow _window;
 
 		public RocketWindow(int w = 1024, int h = 720) {
 			_window = new GameWindow(w, h, new GraphicsMode(GraphicsMode.Default.ColorFormat, GraphicsMode.Default.Depth, GraphicsMode.Default.Stencil, 16), "Game");
+			_window.VSync = VSyncMode.Adaptive;
 			_window.Load += (s, e) => OnInitialize?.Invoke(this, null);
 			_window.RenderFrame += (s, e) => {
 				Tesselate();
@@ -43,6 +48,14 @@ namespace Rocket.Render {
 					GL.Viewport(0,0,_window.Width, _window.Height);
 				}
 			};
+			_window.KeyDown += (s, e) => {
+				_keys.Add(e.Key);
+				OnKeyDown?.Invoke(this, e.Key);
+			};
+			_window.KeyUp += (s, e) => {
+				_keys.Remove(e.Key);
+				OnKeyUp?.Invoke(this, e.Key);
+			};
 		}
 
 		public void Attach(IFeature f) {
@@ -55,6 +68,8 @@ namespace Rocket.Render {
 			f.Detach();
 		}
 
+		public bool IsKey(Key k) => _keys.Contains(k);
+		
 		public void Add(ILayer l) {
 			l.Resize(_window.Width, _window.Height);
 			_layers.Add(l);

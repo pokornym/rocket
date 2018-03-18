@@ -38,7 +38,7 @@ namespace Rocket.Render.Layers {
 			foreach (WorldObject obj in Universe) {
 				int l = 0;
 				foreach (ModelHandle h in obj.Handles) {
-					_uModel.Set(Matrix4.CreateTranslation(0, 0, -0.01f * l++) * h.Transformation * obj.Transformation);
+					_uModel.Set((h.Transformation + obj.Transformation)*Matrix4.CreateTranslation(0, 0, -0.01f * l++));
 
 					h.Draw();
 				}

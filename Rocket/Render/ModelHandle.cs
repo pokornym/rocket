@@ -1,7 +1,20 @@
 ﻿using System;
+using OpenTK;
 
 namespace Rocket.Render {
 	internal sealed class ModelHandle {
+		public Vector2 Position {
+			get => Transformation.Position;
+			set => Transformation.Position = value;
+		}
+		public float Angle {
+			get => Transformation.Angle;
+			set => Transformation.Angle = value;
+		}
+		public float Scale {
+			get => Transformation.Scale;
+			set => Transformation.Scale = value;
+		}
 		public readonly Model Model;
 		public readonly Transformation Transformation = new Transformation();
 
