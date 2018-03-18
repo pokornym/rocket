@@ -21,11 +21,11 @@ namespace Rocket.World.Objects {
 		private readonly Stabilizer _slz = new Stabilizer();
 		private Vector2 _engine = Vector2.Zero;
 
-		public RocketObject(float s, float m, Model r) : base(new CircleCollider(s)) {
+		public RocketObject(float s, float m, float f, Model r) : base(false, new Vector2(2f / 3, 1f)) {
 			_model = Attach(r);
 			_bMass = m;
 			Transformation.Scale = Vector2.One * s;
-			MaxFuel = Fuel = 1000;
+			MaxFuel = Fuel = f;
 		}
 
 		public void MoveCW(float m) => Move(-(float) (Math.PI * 3 / 8), m);
@@ -48,14 +48,15 @@ namespace Rocket.World.Objects {
 				else
 					Transformation.Angle -= (start - target) / 3f;
 			}
+
 			float delta = _slz.GetDelta();
 			if (_engine != Vector2.Zero && _fuel > 0) {
 				float m = _engine.Length * delta;
 				m = Math.Min(m, _fuel);
 				Acceleration = _engine * m;
-				_fuel = Math.Max(_fuel - m , 0f);
+				_fuel = Math.Max(_fuel - m, 0f);
 			} else
-			Acceleration = Vector2.Zero;
+				Acceleration = Vector2.Zero;
 
 			return base.Tick();
 		}

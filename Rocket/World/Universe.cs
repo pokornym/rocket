@@ -20,15 +20,28 @@ namespace Rocket.World {
 			float delta = _stz.GetDelta();
 			for (int i = _objects.Count - 1; i >= 0; i--) {
 				WorldObject obj = _objects[i];
-				if (!obj.Tick())
+				if (!obj.Tick()) {
 					_objects.RemoveAt(i);
+					continue;
+				}
 
-				// Gravity
+				// Gravity and collisions
 				Vector2 accel = obj.Acceleration;
+				bool col = false;
 				foreach (WorldObject g in _objects) {
 					if (g == obj)
 						continue;
+					if (g.Bulk && (!obj.Bulk || obj.Mass <= g.Mass) && obj.IsCollision(g)) {
+						g.OnCollision(obj);
+						col = true;
+					}
+
 					accel += Gravity(obj, g);
+				}
+
+				if (col) {
+					_objects.RemoveAt(i);
+					continue;
 				}
 
 				// Dynamics

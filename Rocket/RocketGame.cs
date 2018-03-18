@@ -55,9 +55,9 @@ namespace Rocket {
 				new Shader(ShaderTypes.Fragment, File.ReadAllText(Path.Combine(SHADERS_DIR, "fragment.glsl")))
 			);
 
-			_universe.Add(new SpaceObject(15, 20, 100000, _planets[0], _atmospheres[0]) { Position = new Vector2(0, 0) });
-			_universe.Add(new SpaceObject(5, 8, 50, _planets[1], _atmospheres[0]) { Position = new Vector2(-500, -500), Velocity = new Vector2(20f, 0) });
-			_universe.Add(_rocket = new RocketObject(30, 50, new RocketModel(_coder)) { Position = new Vector2(500, 500), Velocity = new Vector2(-25f, 0f) });
+			_universe.Add(new SpaceObject(2, 100000, _planets[0], _atmospheres[0]) { Position = new Vector2(0, 0) });
+			_universe.Add(new SpaceObject(8, 50, _planets[1], _atmospheres[0]) { Position = new Vector2(-500, -500), Velocity = new Vector2(30f, 0) });
+			_universe.Add(_rocket = new RocketObject(30, 50, 1000, new RocketModel(_coder)) { Position = new Vector2(500, 500), Velocity = new Vector2(-25f, 0f) });
 
 			RenderHandle handle = new RenderHandle(program);
 			_layer = new SceneLayer(_universe, handle);
