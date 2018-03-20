@@ -19,7 +19,7 @@ namespace Rocket.World.Objects {
 				base.Scale = value;
 			}
 		}
-		public readonly SimpleObject AtmosphereBody = new SimpleObject(new ObbCollider());
+		public readonly SimpleObject AtmosphereBody = new SimpleObject(new CircleCollider());
 		private readonly ModelHandle _body;
 		private readonly ModelHandle _atmosphere;
 		private readonly float _atRatio;

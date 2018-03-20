@@ -7,9 +7,18 @@ namespace Rocket.World.Colliders {
 		public int Order => 1;
 		
 		public bool IsCollision(WorldElement self, WorldElement other) {
-			Vector2[] selfV = GetCorners(self);
-			Vector2[] otherV = GetCorners(other);
-			return SAT(GetNormals(self), selfV, otherV) && SAT(GetNormals(other), selfV, otherV);
+			if (other.Collider is ObbCollider) {
+				Vector2[] selfV = GetCorners(self);
+				Vector2[] otherV = GetCorners(other);
+				return SAT(GetNormals(self), selfV, otherV) && SAT(GetNormals(other), selfV, otherV);
+			}
+			if (other.Collider is CircleCollider) {
+				Vector2[] selfV = GetCorners(self);
+				Vector2[] otherV = GetCircleExtremes(other);
+				return SAT(GetNormals(self), selfV, otherV);
+			}
+			
+			throw new NotImplementedException();
 		}
 		
 		private Vector2[] GetCorners(WorldElement obj) {
@@ -21,6 +30,18 @@ namespace Rocket.World.Colliders {
 				new Vector2(hBox.X * cos - hBox.Y * sin, hBox.X * sin + hBox.Y * cos) + obj.Position,
 				new Vector2(hBox.X * cos + hBox.Y * sin, -hBox.X * sin - hBox.Y * cos) + obj.Position,
 				new Vector2(-hBox.X * cos + hBox.Y * sin, -hBox.X * sin - hBox.Y * cos) + obj.Position
+			};
+		}
+
+		private Vector2[] GetCircleExtremes(WorldElement obj) {
+			Vector2 hBox = obj.Scale * obj.Aspect;
+			float sin = (float) Math.Sin(obj.Angle);
+			float cos = (float) Math.Cos(obj.Angle);
+			return new[] {
+				new Vector2(-hBox.Y * sin, hBox.Y * cos) + obj.Position,
+				new Vector2(-hBox.X * cos, -hBox.X * sin) + obj.Position,
+				new Vector2(hBox.Y * sin,- hBox.Y * cos) + obj.Position,
+				new Vector2(hBox.X * cos, hBox.X * sin) + obj.Position
 			};
 		}
 
