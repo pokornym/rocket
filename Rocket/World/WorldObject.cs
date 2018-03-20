@@ -4,18 +4,27 @@ using OpenTK;
 using Rocket.Render;
 
 namespace Rocket.World {
-	internal abstract class WorldObject : CollisionBody {
-		public override Vector2 Position {
-			get => Transformation.Position;
-			set => Transformation.Position = value;
+	internal abstract class WorldObject : WorldElement {
+		public Vector2 Position {
+			get => base.Position;
+			set {
+				Transformation.Position = value;
+				base.Position = value;
+			}
 		}
-		public override Vector2 Scale {
-			get => Transformation.Scale;
-			set => Transformation.Scale = value;
+		public Vector2 Scale {
+			get => base.Scale;
+			protected set {
+				Transformation.Scale = value;
+				base.Scale = value;
+			}
 		}
-		public override float Angle {
-			get => Transformation.Angle;
-			set => Transformation.Angle = value;
+		public float Angle {
+			get => base.Angle;
+			protected set {
+				Transformation.Angle = value;
+				base.Angle = value;
+			}
 		}
 		public Vector2 Velocity = Vector2.Zero;
 		public Vector2 Acceleration = Vector2.Zero;
@@ -26,7 +35,7 @@ namespace Rocket.World {
 		public readonly bool Bulk;
 		private readonly List<ModelHandle> _handels = new List<ModelHandle>();
 
-		public WorldObject(bool bulk, Vector2 a) {
+		public WorldObject(bool bulk, Vector2 a, ICollider col) : base(col) {
 			Bulk = bulk;
 			Aspect = a;
 		}

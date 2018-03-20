@@ -13,7 +13,7 @@ namespace Rocket.Render.OpenGL {
 		}
 
 		protected override int CreateElement() {
-			int id = GL.CreateShader((ShaderType) Type);
+			int id = GL.CreateShader((ShaderType) Type); 
 			GL.ShaderSource(id, Code);
 			GL.CompileShader(id);
 			string error = GL.GetShaderInfoLog(id);

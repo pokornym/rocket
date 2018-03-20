@@ -52,7 +52,7 @@ namespace Rocket.World {
 
 		private static Vector2 Gravity(WorldObject from, WorldObject to) {
 			Vector2 dir = to.Position - from.Position;
-			return G_CONSTNAT * from.Mass * to.Mass / dir.LengthSquared / from.Mass * dir.Normalized();
+			return G_CONSTNAT * to.Mass / dir.LengthSquared * dir.Normalized();
 		}
 
 		public IEnumerator<WorldObject> GetEnumerator() => _objects.GetEnumerator();

@@ -1,6 +1,7 @@
 ﻿using System;
 using OpenTK;
 using Rocket.Render;
+using Rocket.World.Colliders;
 
 namespace Rocket.World.Objects {
 	internal sealed class RocketObject : WorldObject {
@@ -22,7 +23,7 @@ namespace Rocket.World.Objects {
 		private readonly Stabilizer _slz = new Stabilizer();
 		private Vector2 _engine = Vector2.Zero;
 
-		public RocketObject(float s, float m, float f, Model r) : base(false, new Vector2(2f / 3, 1f)) {
+		public RocketObject(float s, float m, float f, Model r) : base(false, new Vector2(2f / 3, 1f), new ObbCollider()) {
 			_model = Attach(r);
 			_bMass = m;
 			Scale = Vector2.One * s;
@@ -60,7 +61,7 @@ namespace Rocket.World.Objects {
 			}
 
 			foreach (WorldObject obj in Universe) {
-				if (obj is SpaceObject s && s.AtmosphereBody.IsCollision(this))
+				if (obj is SpaceObject s && IsCollision(s.AtmosphereBody))
 					acc += -Velocity * DRAG;
 			}
 

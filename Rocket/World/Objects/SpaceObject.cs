@@ -1,29 +1,30 @@
 ﻿using System;
 using OpenTK;
 using Rocket.Render;
+using Rocket.World.Colliders;
 
 namespace Rocket.World.Objects {
 	internal sealed class SpaceObject : WorldObject {
-		public override Vector2 Position {
+		public Vector2 Position {
 			get => base.Position;
 			set {
 				AtmosphereBody.Position = value;
 				base.Position = value;
 			}
 		}
-		public override Vector2 Scale {
+		public Vector2 Scale {
 			get => base.Scale;
 			set {
 				AtmosphereBody.Scale = _atRatio * value;
 				base.Scale = value;
 			}
 		}
-		public readonly CollisionBody AtmosphereBody = new CollisionBody();
+		public readonly SimpleObject AtmosphereBody = new SimpleObject(new ObbCollider());
 		private readonly ModelHandle _body;
 		private readonly ModelHandle _atmosphere;
 		private readonly float _atRatio;
 
-		public SpaceObject(float a, float m, Model body, Model atm) : base(true, Vector2.One) {
+		public SpaceObject(float a, float m, Model body, Model atm) : base(true, Vector2.One, new ObbCollider()) {
 			Mass = m;
 			_atmosphere = Attach(atm);
 			_atmosphere.Scale = new Vector2(_atRatio = a);
