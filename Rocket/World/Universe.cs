@@ -6,6 +6,7 @@ using OpenTK;
 namespace Rocket.World {
 	internal sealed class Universe : IEnumerable<WorldObject> {
 		private const float G_CONSTNAT = 5;
+		public int TimeWrap = 1;
 		private readonly List<WorldObject> _objects = new List<WorldObject>();
 		private readonly Stabilizer _stz = new Stabilizer();
 
@@ -18,10 +19,11 @@ namespace Rocket.World {
 
 		public void Tick() {
 			float delta = _stz.GetDelta();
-			for (int i = _objects.Count - 1; i >= 0; i--) {
-				WorldObject obj = _objects[i];
+			for (int i = 0; i < TimeWrap; i++)
+			for (int j = _objects.Count - 1; j >= 0; j--) {
+				WorldObject obj = _objects[j];
 				if (!obj.Tick()) {
-					_objects.RemoveAt(i);
+					_objects.RemoveAt(j);
 					continue;
 				}
 
@@ -40,7 +42,7 @@ namespace Rocket.World {
 				}
 
 				if (col) {
-					_objects.RemoveAt(i);
+					_objects.RemoveAt(j);
 					continue;
 				}
 

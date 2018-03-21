@@ -56,7 +56,8 @@ namespace Rocket {
 
 			_universe.Add(new SpaceObject(2, 100000, _planets[0], _atmospheres[0]) { Position = new Vector2(0, 0) });
 			_universe.Add(new SpaceObject(8, 50, _planets[1], _atmospheres[0]) { Position = new Vector2(-500, -500), Velocity = new Vector2(30f, 0) });
-			_universe.Add(_rocket = new RocketObject(30, 50, 1000, new RocketModel(_coder)) { Position = new Vector2(500, 500), Velocity = new Vector2(-25f, 0f) });
+			_universe.Add(new SpaceObject(0, 250, _planets[0], _atmospheres[0]) { Position = new Vector2(500, -500), Velocity = new Vector2(30f, 0) });
+			_universe.Add(_rocket = new RocketObject(30, 50, 1000, new RocketModel(_coder)) { Position = new Vector2(500, 500), Velocity = new Vector2(-30f, 0f) });
 
 			RenderHandle handle = new RenderHandle(program);
 			_layer = new SceneLayer(_universe, handle);
@@ -73,6 +74,11 @@ namespace Rocket {
 				_rocket.MoveForward(1f);
 			else
 				_rocket.StopMovement();
+
+			if (_window.IsKey(Key.KeypadPlus))
+				_universe.TimeWrap++;
+			else if (_window.IsKey(Key.KeypadMinus))
+				_universe.TimeWrap--;
 
 			_universe.Tick();
 
