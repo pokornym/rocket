@@ -1,8 +1,8 @@
 ﻿using OpenTK;
-using Rocket.Render.OpenGL;
+using Rocket.Engine.OpenGL;
 
 namespace Rocket.Render {
-	internal sealed class RenderHandle {
+	public sealed class RenderHandle {
 		public readonly GlProgram Program;
 		private readonly Uniform _uModel;
 		private readonly Uniform _uView;

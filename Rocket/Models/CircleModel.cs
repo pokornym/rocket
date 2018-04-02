@@ -1,7 +1,8 @@
 ﻿using System;
 using OpenTK;
+using Rocket.Engine;
+using Rocket.Engine.OpenGL;
 using Rocket.Render;
-using Rocket.Render.OpenGL;
 
 namespace Rocket.Models {
 	internal class CircleModel : Model {

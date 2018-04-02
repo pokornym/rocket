@@ -3,11 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using OpenTK;
 using OpenTK.Input;
+using Rocket.Engine;
+using Rocket.Engine.Features;
+using Rocket.Engine.OpenGL;
 using Rocket.Models;
 using Rocket.Render;
-using Rocket.Render.Features;
 using Rocket.Render.Layers;
-using Rocket.Render.OpenGL;
 using Rocket.World;
 using Rocket.World.Objects;
 
@@ -18,7 +19,7 @@ namespace Rocket {
 		private const int PLANET_TRIANGLES = 16;
 		private const string SHADERS_DIR = "shaders";
 
-		private readonly RocketWindow _window;
+		private readonly GlWindow _window;
 		private readonly VertexCoder _coder = new VertexCoder();
 		private readonly Universe _universe = new Universe();
 		private SceneLayer _layer;
@@ -28,7 +29,7 @@ namespace Rocket {
 		private RocketObject _rocket;
 
 		public RocketGame(string[] args) {
-			_window = new RocketWindow();
+			_window = new GlWindow();
 			_window.Attach(new BlendingFeature());
 			_window.OnInitialize += (s, e) => Initialize();
 			_window.OnUpdate += (s, e) => Update();

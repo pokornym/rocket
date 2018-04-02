@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using OpenTK;
-using Rocket.Render.OpenGL;
+using Rocket.Engine.OpenGL;
 
 namespace Rocket.Render {
 	internal sealed class VertexCoder : IVertexCoder<Vertex> {
