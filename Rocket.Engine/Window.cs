@@ -7,7 +7,7 @@ using OpenTK.Input;
 using Rocket.Engine.OpenGL;
 
 namespace Rocket.Engine {
-	public sealed class GlWindow {
+	public class Window {
 		public int Width {
 			get => _window.Width;
 			set => _window.Width = value;
@@ -22,27 +22,27 @@ namespace Rocket.Engine {
 		}
 		public float FPS => (float) _window.RenderFrequency;
 		public float UPS => (float) _window.UpdateFrequency;
-		public event EventHandler OnUpdate;
-		public event EventHandler OnInitialize;
-		public event EventHandler OnUninitialize;
-		public event EventHandler<Key> OnKeyDown;
-		public event EventHandler<Key> OnKeyUp;
-		public event EventHandler<float> OnWheel;
+		public event EventHandler Initialize;
+		public event EventHandler Update;
+		public event EventHandler Uninitialize;
+		public event EventHandler<Key> KeyDown;
+		public event EventHandler<Key> KeyUp;
+		public event EventHandler<float> Wheel;
 		private readonly List<Key> _keys = new List<Key>();
 		private readonly List<IFeature> _features = new List<IFeature>();
 		private readonly List<ILayer> _layers = new List<ILayer>();
 		private readonly GameWindow _window;
 
-		public GlWindow(int w = 1024, int h = 720) {
+		public Window(int w = 1024, int h = 720) {
 			_window = new GameWindow(w, h, new GraphicsMode(GraphicsMode.Default.ColorFormat, GraphicsMode.Default.Depth, GraphicsMode.Default.Stencil, 16), "Game");
 			_window.VSync = VSyncMode.Adaptive;
-			_window.Load += (s, e) => OnInitialize?.Invoke(this, null);
+			_window.Load += (s, e) => OnInitialize();
 			_window.RenderFrame += (s, e) => {
 				Tesselate();
 				GlProtection.FailIfError();
 			};
-			_window.UpdateFrame += (s, e) => OnUpdate?.Invoke(this, null);
-			_window.Unload += (s, e) => OnUninitialize?.Invoke(this, null);
+			_window.UpdateFrame += (s, e) => OnUpdate();
+			_window.Unload += (s, e) => OnUnitialize();
 			_window.Resize += (s, e) => {
 				foreach (ILayer layer in _layers) {
 					layer.Resize(_window.Width, _window.Height);
@@ -52,17 +52,21 @@ namespace Rocket.Engine {
 			_window.KeyDown += (s, e) => {
 				if (!_keys.Contains(e.Key))
 					_keys.Add(e.Key);
-				OnKeyDown?.Invoke(this, e.Key);
+				OnKeyDown(e.Key);
 			};
 			_window.KeyUp += (s, e) => {
 				if (_keys.Contains(e.Key))
 					_keys.Remove(e.Key);
-				OnKeyUp?.Invoke(this, e.Key);
+				OnKeyUp(e.Key);
 			};
-			_window.MouseWheel += (s, e) => OnWheel?.Invoke(this, e.DeltaPrecise);
+			_window.MouseWheel += (s, e) => OnWheel(e.DeltaPrecise);
 			_window.FocusedChanged += (s, e) => {
-				if (!_window.Focused)
-					_keys.Clear();
+				if (_window.Focused)
+					return;
+
+				foreach (Key k in _keys)
+					OnKeyUp(k);
+				_keys.Clear();
 			};
 		}
 
@@ -78,16 +82,28 @@ namespace Rocket.Engine {
 
 		public bool IsKey(Key k) => _keys.Contains(k);
 
-		public void Add(ILayer l) {
+		public void AddLayer(ILayer l) {
 			l.Resize(_window.Width, _window.Height);
 			_layers.Add(l);
 		}
 
-		public void Remove(ILayer l) => _layers.Remove(l);
+		public void RemoveLayer(ILayer l) => _layers.Remove(l);
 
 		public void Start(int fps, int ups) {
 			_window.Run(ups, fps);
 		}
+
+		protected virtual void OnInitialize() => Initialize?.Invoke(this, null);
+
+		protected virtual void OnUpdate() => Update?.Invoke(this, null);
+
+		protected virtual void OnUnitialize() => Uninitialize?.Invoke(this, null);
+
+		protected virtual void OnKeyDown(Key k) => KeyDown?.Invoke(this, k);
+
+		protected virtual void OnKeyUp(Key k) => KeyUp?.Invoke(this, k);
+
+		protected virtual void OnWheel(float delta) => Wheel?.Invoke(this, delta);
 
 		private void Tesselate() {
 			GL.Clear(ClearBufferMask.ColorBufferBit);

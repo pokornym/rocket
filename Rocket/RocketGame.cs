@@ -13,13 +13,12 @@ using Rocket.World;
 using Rocket.World.Objects;
 
 namespace Rocket {
-	internal sealed class RocketGame {
-		private const int FPS = 30;
-		private const int UPS = 30;
+	internal sealed class RocketGame : Window {
+		private const int TARGET_FPS = 30;
+		private const int TARGET_UPS = 30;
 		private const int PLANET_TRIANGLES = 16;
 		private const string SHADERS_DIR = "shaders";
 
-		private readonly GlWindow _window;
 		private readonly VertexCoder _coder = new VertexCoder();
 		private readonly Universe _universe = new Universe();
 		private SceneLayer _layer;
@@ -29,19 +28,15 @@ namespace Rocket {
 		private RocketObject _rocket;
 
 		public RocketGame(string[] args) {
-			_window = new GlWindow();
-			_window.Attach(new BlendingFeature());
-			_window.OnInitialize += (s, e) => Initialize();
-			_window.OnUpdate += (s, e) => Update();
-			_window.OnWheel += (s, e) => _layer.Camera.Zoom = Math.Max(Math.Min(_layer.Camera.Zoom + e * 0.1f, 3f), 0.2f);
-			_window.Title = "Rocket";
+			Attach(new BlendingFeature());
+			Title = "Rocket";
 		}
 
 		public void Start() {
-			_window.Start(FPS, UPS);
+			Start(TARGET_FPS, TARGET_UPS);
 		}
 
-		private void Initialize() {
+		protected override void OnInitialize() {
 			_planets = new Model[] {
 				new CircleModel(_coder, PLANET_TRIANGLES, Color.Green),
 				new CircleModel(_coder, PLANET_TRIANGLES, Color.Red)
@@ -62,23 +57,25 @@ namespace Rocket {
 
 			RenderHandle handle = new RenderHandle(program);
 			_layer = new SceneLayer(_universe, handle);
-			_window.Add(_layer);
-			_window.Add(new FuelLayer(_rocket, handle, new RectangleModel(_coder, Color.Red)));
+			AddLayer(_layer);
+			AddLayer(new FuelLayer(_rocket, handle, new RectangleModel(_coder, Color.Red)));
+			
+			base.OnInitialize();
 		}
 
-		private void Update() {
-			if (_window.IsKey(Key.A))
-				_rocket.MoveCCW(_window.IsKey(Key.W) ? 2f : 1f);
-			else if (_window.IsKey(Key.D))
-				_rocket.MoveCW(_window.IsKey(Key.W) ? 2f : 1f);
-			else if (_window.IsKey(Key.W))
+		protected override void OnUpdate() {
+			if (IsKey(Key.A))
+				_rocket.MoveCCW(IsKey(Key.W) ? 2f : 1f);
+			else if (IsKey(Key.D))
+				_rocket.MoveCW(IsKey(Key.W) ? 2f : 1f);
+			else if (IsKey(Key.W))
 				_rocket.MoveForward(1f);
 			else
 				_rocket.StopMovement();
 
-			if (_window.IsKey(Key.KeypadPlus))
+			if (IsKey(Key.KeypadPlus))
 				_universe.TimeWrap++;
-			else if (_window.IsKey(Key.KeypadMinus))
+			else if (IsKey(Key.KeypadMinus))
 				_universe.TimeWrap--;
 
 			_universe.Tick();
@@ -86,9 +83,16 @@ namespace Rocket {
 			_layer.Camera.Position = _rocket.Position;
 
 			if (_tick + 1000 <= Environment.TickCount) {
-				Debug.WriteLine($"{_window.FPS:F2} FPS, {_window.UPS:F2} UPS");
+				Debug.WriteLine($"{FPS:F2} FPS, {UPS:F2} UPS");
 				_tick = Environment.TickCount;
 			}
+			
+			base.OnUpdate();
+		}
+		
+		protected override void OnWheel(float delta) {
+			_layer.Camera.Zoom = Math.Max(Math.Min(_layer.Camera.Zoom + delta * 0.1f, 3f), 0.2f);
+			base.OnWheel(delta);
 		}
 	}
 }
