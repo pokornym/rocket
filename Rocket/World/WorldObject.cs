@@ -6,29 +6,29 @@ using Rocket.Render;
 
 namespace Rocket.World {
 	internal abstract class WorldObject : WorldElement {
-		public Vector2 Position {
+		public Vector3 Position {
 			get => base.Position;
 			set {
 				Transformation.Position = value;
 				base.Position = value;
 			}
 		}
-		public Vector2 Scale {
+		public Vector3 Scale {
 			get => base.Scale;
 			protected set {
 				Transformation.Scale = value;
 				base.Scale = value;
 			}
 		}
-		public float Angle {
-			get => base.Angle;
+		public Vector3 Rotation {
+			get => base.Rotation;
 			protected set {
-				Transformation.Angle = value;
-				base.Angle = value;
+				Transformation.Rotation = value;
+				base.Rotation = value;
 			}
 		}
-		public Vector2 Velocity = Vector2.Zero;
-		public Vector2 Acceleration = Vector2.Zero;
+		public Vector3 Velocity = Vector3.Zero;
+		public Vector3 Acceleration = Vector3.Zero;
 		public float Mass = 1;
 		public readonly Transformation Transformation = new Transformation();
 		public IEnumerable<ModelHandle> Handles => _handels;
@@ -36,7 +36,7 @@ namespace Rocket.World {
 		public readonly bool Bulk;
 		private readonly List<ModelHandle> _handels = new List<ModelHandle>();
 
-		public WorldObject(bool bulk, Vector2 a, ICollider col) : base(col) {
+		public WorldObject(bool bulk, Vector3 a, ICollider col) : base(col) {
 			Bulk = bulk;
 			Aspect = a;
 		}

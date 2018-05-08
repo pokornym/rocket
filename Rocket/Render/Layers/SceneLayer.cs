@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using OpenTK;
 using Rocket.Engine;
+using Rocket.Engine.Features;
 using Rocket.World;
 
 namespace Rocket.Render.Layers {
@@ -9,12 +11,13 @@ namespace Rocket.Render.Layers {
 		public readonly Camera Camera = new Camera();
 		private Matrix4 _projection;
 		private readonly RenderHandle _ren;
+
 		public SceneLayer(Universe s, RenderHandle ren) {
 			Universe = s ?? throw new ArgumentNullException(nameof(s));
 			_ren = ren ?? throw new ArgumentNullException(nameof(ren));
 		}
 
-		public void Resize(int w, int h) => _projection = Matrix4.CreateOrthographic(w, h, -100, 100);
+		public void Resize(int w, int h) => _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, (float) w / h, 1, 10000);
 
 		public void Render() {
 			_ren.Program.Bind();
@@ -22,15 +25,24 @@ namespace Rocket.Render.Layers {
 			_ren.SetProjection(_projection);
 			_ren.SetView(Camera.Matrix);
 
-			int l = 0;
+			_ren.Window.Disable<DepthFeature>();
 			foreach (WorldObject obj in Universe) {
-				foreach (ModelHandle h in obj.Handles) {
-					_ren.SetModel((h.Transformation + obj.Transformation) * Matrix4.CreateTranslation(0, 0, 0.01f * l++));
+				foreach (ModelHandle h in obj.Handles.Where(i => i.Model.IsTransparent)) {
+					_ren.SetModel(h.Transformation + obj.Transformation);
 
 					h.Draw();
 				}
 			}
+			_ren.Window.Enable<DepthFeature>();
+			
+			foreach (WorldObject obj in Universe) {
+				foreach (ModelHandle h in obj.Handles.Where(i => !i.Model.IsTransparent)) {
+					_ren.SetModel(h.Transformation + obj.Transformation);
 
+					h.Draw();
+				}
+			}
+			
 			_ren.Program.Unbind();
 		}
 	}

@@ -1,41 +1,63 @@
-﻿using OpenTK;
+﻿using System;
+using System.Collections.Generic;
+using OpenTK;
 using Rocket.Engine;
 using Rocket.Engine.OpenGL;
 using Rocket.Render;
 
 namespace Rocket.Models {
 	internal sealed class RocketModel : Model {
-		private readonly VertexArray<Vertex> _hull;
-		private readonly VertexArray<Vertex> _tip;
-		private readonly VertexArray<Vertex> _lFin;
-		private readonly VertexArray<Vertex> _rFin;
+		private static readonly float COS_HPI = (float)Math.Cos(Math.PI / 2);
+		private static readonly float SIN_HPI = (float)Math.Sin(Math.PI / 2);
+		protected override Face[] Faces { get; }
 
-		public RocketModel(IVertexCoder<Vertex> coder) : base(4) {
-			_tip = new VertexArray<Vertex>(coder, 3) {
-				[0] = new Vertex(new Vector2(0, 1), Color.IndianRed, new Vector2(1 / 2f, 0)),
-				[1] = new Vertex(new Vector2(-1 / 3f, 1 / 3f), Color.IndianRed, new Vector2(0, 1)),
-				[2] = new Vertex(new Vector2(1 / 3f, 1 / 3f), Color.IndianRed, new Vector2(1, 1))
-			};
-			Faces[0] = new Face(_tip, GeometricPrimitives.Triangles);
-			_hull = new VertexArray<Vertex>(coder, 4) {
-				[0] = new Vertex(new Vector2(-1 / 3f, 1 / 3f), Color.Blue, new Vector2(0, 0)),
-				[1] = new Vertex(new Vector2(-1 / 3f, -1), Color.Blue, new Vector2(0, 1)),
-				[2] = new Vertex(new Vector2(1 / 3f, -1), Color.Blue, new Vector2(1, 1)),
-				[3] = new Vertex(new Vector2(1 / 3f, 1 / 3f), Color.Blue, new Vector2(1, 0))
-			};
-			Faces[1] = new Face(_hull, GeometricPrimitives.Quads);
-			_lFin = new VertexArray<Vertex>(coder, 3) {
-				[0] = new Vertex(new Vector2(-1 / 3f, -1 / 3f), Color.Orange, new Vector2(1, 0)),
-				[1] = new Vertex(new Vector2(-1 / 3f, -1), Color.Orange, new Vector2(1, 1)),
-				[2] = new Vertex(new Vector2(-2 / 3f, -1), Color.Orange, new Vector2(0, 1))
-			};
-			Faces[2] = new Face(_lFin, GeometricPrimitives.Triangles);
-			_rFin = new VertexArray<Vertex>(coder, 3) {
-				[0] = new Vertex(new Vector2(1 / 3f, -1 / 3f), Color.Orange, new Vector2(0, 0)),
-				[1] = new Vertex(new Vector2(1 / 3f, -1), Color.Orange, new Vector2(0, 1)),
-				[2] = new Vertex(new Vector2(2 / 3f, -1), Color.Orange, new Vector2(1, 1))
-			};
-			Faces[3] = new Face(_rFin, GeometricPrimitives.Triangles);
+		public RocketModel(IVertexCoder<Vertex> coder) {
+			Faces = new Face[4];
+			Faces[0] = new Face(Compose(new[] {
+				new Vector3(0, 0, 1),
+				new Vector3(1f / 3, -1f / 3, 1f / 3),
+				new Vector3(1f / 3, 1f / 3, 1f / 3)
+			}, Color.IndianRed, coder), GeometricPrimitives.Triangles);
+			Faces[1] = new Face(Compose(new[] {
+				new Vector3(1f / 3, -1f / 3, 1f / 3),
+				new Vector3(1f / 3, -1f / 3, -1),
+				new Vector3(1f / 3, 1f / 3, -1),
+				new Vector3(1f / 3, 1f / 3, 1f / 3)
+			}, Color.Blue, coder), GeometricPrimitives.Quads);
+			Faces[2] = new Face(Compose(new[] {
+				new Vector3(1f / 3,0, -1f / 3),
+				new Vector3(1f / 3,0, -1f),
+				new Vector3(2f / 3,0, -1f)
+			}, Color.Orange, coder), GeometricPrimitives.Triangles);
+			Faces[3] = new Face(new VertexArray<Vertex>(coder, new List<Vertex>() {
+				new Vertex(new Vector3(1f / 3, -1f / 3, -1f), Color.Blue, Vector2.Zero),
+				new Vertex(new Vector3(-1f / 3, -1f / 3, -1f), Color.Blue, Vector2.Zero),
+				new Vertex(new Vector3(-1f / 3, 1f / 3, -1f), Color.Blue, Vector2.Zero),
+				new Vertex(new Vector3(1f / 3, 1f / 3, -1f), Color.Blue, Vector2.Zero)
+			}), GeometricPrimitives.Quads);
+		}
+
+		private static VertexArray<Vertex> Compose(Vector3[] buff, Color col, IVertexCoder<Vertex> coder) {
+			int offset = 0;
+			VertexArray<Vertex> vtx = new VertexArray<Vertex>(coder, buff.Length * 4);
+			for (int i = 0; i < 4; i++) {
+				Vertices(buff);
+				Rotate(ref buff);
+			}
+
+			return vtx;
+
+			void Vertices(IEnumerable<Vector3> vec) {
+				foreach (Vector3 v in vec)
+					vtx[offset++] = new Vertex(v, col, Vector2.Zero);
+			}
+		}
+
+		private static void Rotate(ref Vector3[] buff) {
+			for (int i = 0; i < buff.Length; i++) {
+				Vector3 v = buff[i];
+				buff[i] = new Vector3(COS_HPI * v.X - SIN_HPI * v.Y, SIN_HPI * v.X + COS_HPI * v.Y, v.Z);
+			}
 		}
 	}
 }

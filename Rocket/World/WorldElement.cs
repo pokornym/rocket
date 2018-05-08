@@ -3,10 +3,10 @@ using OpenTK;
 
 namespace Rocket.World {
 	internal abstract class WorldElement {
-		public virtual Vector2 Aspect { get; set; } = Vector2.One;
-		public virtual Vector2 Position { get; set; }
-		public virtual Vector2 Scale { get; set; } = Vector2.One;
-		public virtual float Angle { get; set; }
+		public virtual Vector3 Aspect { get; set; } = Vector3.One;
+		public virtual Vector3 Position { get; set; }
+		public virtual Vector3 Scale { get; set; } = Vector3.One;
+		public virtual Vector3 Rotation { get; set; }
 		public readonly ICollider Collider;
 
 		public WorldElement(ICollider coll) => Collider = coll ?? throw new ArgumentNullException(nameof(coll));

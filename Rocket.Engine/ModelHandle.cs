@@ -3,15 +3,15 @@ using OpenTK;
 
 namespace Rocket.Engine {
 	public sealed class ModelHandle {
-		public Vector2 Position {
+		public Vector3 Position {
 			get => Transformation.Position;
 			set => Transformation.Position = value;
 		}
-		public float Angle {
-			get => Transformation.Angle;
-			set => Transformation.Angle = value;
+		public Vector3 Rotation {
+			get => Transformation.Rotation;
+			set => Transformation.Rotation = value;
 		}
-		public Vector2 Scale {
+		public Vector3 Scale {
 			get => Transformation.Scale;
 			set => Transformation.Scale = value;
 		}

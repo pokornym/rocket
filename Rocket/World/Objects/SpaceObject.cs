@@ -6,14 +6,14 @@ using Rocket.World.Colliders;
 
 namespace Rocket.World.Objects {
 	internal sealed class SpaceObject : WorldObject {
-		public Vector2 Position {
+		public Vector3 Position {
 			get => base.Position;
 			set {
 				AtmosphereBody.Position = value;
 				base.Position = value;
 			}
 		}
-		public Vector2 Scale {
+		public Vector3 Scale {
 			get => base.Scale;
 			set {
 				AtmosphereBody.Scale = _atRatio * value;
@@ -25,12 +25,12 @@ namespace Rocket.World.Objects {
 		private readonly ModelHandle _atmosphere;
 		private readonly float _atRatio;
 
-		public SpaceObject(float a, float m, Model body, Model atm) : base(true, Vector2.One, new ObbCollider()) {
+		public SpaceObject(float a, float m, Model body, Model atm) : base(true, Vector3.One, new CircleCollider()) {
 			Mass = m;
-			_atmosphere = Attach(atm);
-			_atmosphere.Scale = new Vector2(_atRatio = a);
 			_body = Attach(body);
-			_body.Scale = Vector2.One;
+			_body.Scale = Vector3.One;
+			_atmosphere = Attach(atm);
+			_atmosphere.Scale = new Vector3(_atRatio = a);
 			SetProperties();
 		}
 
@@ -41,13 +41,13 @@ namespace Rocket.World.Objects {
 		}
 
 		public override bool Tick() {
-			_body.Angle += 0.005f;
-			_atmosphere.Angle -= 0.01f;
+			_body.Rotation = new Vector3(_body.Rotation.X, _body.Rotation.Y, _body.Rotation.Z + 0.005f);
+			_atmosphere.Rotation = new Vector3(_body.Rotation.X, _body.Rotation.Y, _body.Rotation.Z - 0.01f);;
 			return true;
 		}
 
 		private void SetProperties() {
-			Scale = new Vector2((float) Math.Log(Mass, 2) * 5f);
+			Scale = new Vector3((float) Math.Log(Mass, 2) * 5f);
 		}
 	}
 }

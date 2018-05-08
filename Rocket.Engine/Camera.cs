@@ -3,34 +3,34 @@ using OpenTK;
 
 namespace Rocket.Engine {
 	public sealed class Camera {
-		public Vector2 Position {
+		public Vector3 Position {
 			get => _pos;
 			set {
 				_pos = value;
 				ComputeMatrix();
 			}
 		}
-		public float Angle {
-			get => _angle % ((float) Math.PI * 2);
+		public Vector3 Direction {
+			get => _dir;
 			set {
-				_angle = value;
+				_dir = value;
 				ComputeMatrix();
 			}
 		}
-		public float Zoom {
-			get => _zoom;
+		public Vector3 Up {
+			get => _up;
 			set {
-				_zoom = value;
+				_up = value;
 				ComputeMatrix();
 			}
 		}
 		public Matrix4 Matrix { get; private set; }
-		private Vector2 _pos = Vector2.Zero;
-		private float _angle = 0;
-		private float _zoom = 1;
+		private Vector3 _pos = new Vector3(-300f, 0, 0);
+		private Vector3 _dir = new Vector3(1f, 0, 0);
+		private Vector3 _up = new Vector3(0, 0f, 1f);
 
 		public Camera() => ComputeMatrix();
 
-		private void ComputeMatrix() => Matrix = Matrix4.CreateScale(_zoom) * Matrix4.CreateRotationZ(_angle) * Matrix4.CreateTranslation(_zoom * -_pos.X, _zoom * -_pos.Y, 0);
+		private void ComputeMatrix() => Matrix = Matrix4.LookAt(_pos, _dir, _up);
 	}
 }

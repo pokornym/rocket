@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -23,13 +24,14 @@ namespace Rocket.Engine {
 		public float FPS => (float) _window.RenderFrequency;
 		public float UPS => (float) _window.UpdateFrequency;
 		public event EventHandler Initialize;
+		public event EventHandler Frame;
 		public event EventHandler Update;
 		public event EventHandler Uninitialize;
 		public event EventHandler<Key> KeyDown;
 		public event EventHandler<Key> KeyUp;
 		public event EventHandler<float> Wheel;
 		private readonly List<Key> _keys = new List<Key>();
-		private readonly List<IFeature> _features = new List<IFeature>();
+		private readonly List<FeatureHandle> _features = new List<FeatureHandle>();
 		private readonly List<ILayer> _layers = new List<ILayer>();
 		private readonly GameWindow _window;
 
@@ -38,6 +40,7 @@ namespace Rocket.Engine {
 			_window.VSync = VSyncMode.Adaptive;
 			_window.Load += (s, e) => OnInitialize();
 			_window.RenderFrame += (s, e) => {
+				OnFrame();
 				Tesselate();
 				GlProtection.FailIfError();
 			};
@@ -71,15 +74,29 @@ namespace Rocket.Engine {
 		}
 
 		public void Attach(IFeature f) {
-			_features.Add(f);
-			f.Attach();
+			FeatureHandle h = new FeatureHandle(f);
+			_features.Add(h);
+			h.Attach();
+		}
+
+		public void Enable<T>() where T : IFeature {
+			foreach (FeatureHandle h in _features.Where(i => i.Feature is T))
+				h.Attach();
 		}
 
 		public void Detach(IFeature f) {
-			_features.Remove(f);
-			f.Detach();
+			FeatureHandle h = _features.FirstOrDefault(i => i.Feature == f);
+			if (h == null)
+				return;
+			_features.Remove(h);
+			h.Detach();
 		}
 
+		public void Disable<T>() where T : IFeature {
+			foreach (FeatureHandle h in _features.Where(i => i.Feature is T))
+				h.Detach();
+		}
+		
 		public bool IsKey(Key k) => _keys.Contains(k);
 
 		public void AddLayer(ILayer l) {
@@ -95,6 +112,8 @@ namespace Rocket.Engine {
 
 		protected virtual void OnInitialize() => Initialize?.Invoke(this, null);
 
+		protected virtual void OnFrame() => Frame?.Invoke(this, null);
+		
 		protected virtual void OnUpdate() => Update?.Invoke(this, null);
 
 		protected virtual void OnUnitialize() => Uninitialize?.Invoke(this, null);
@@ -108,16 +127,47 @@ namespace Rocket.Engine {
 		private void Tesselate() {
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
-			foreach (IFeature f in _features)
+			foreach (FeatureHandle f in _features)
 				f.Before();
 
 			foreach (ILayer l in _layers)
 				l.Render();
 
-			foreach (IFeature f in _features)
+			foreach (FeatureHandle f in _features)
 				f.After();
 
 			_window.SwapBuffers();
+		}
+
+		private sealed class FeatureHandle : IFeature{
+			public readonly IFeature Feature;
+			public bool Enabled { get; private set; }
+
+			public FeatureHandle(IFeature f) => Feature = f ?? throw new ArgumentNullException(nameof(f));
+			
+			public void Attach() {
+				if (Enabled)
+					return;
+				Feature.Attach();
+				Enabled = true;
+			}
+
+			public void Detach() {
+				if (!Enabled)
+					return;
+				Feature.Detach();
+				Enabled = false;
+			}
+
+			public void Before() {
+				if (Enabled)
+					Feature.Before();
+			}
+
+			public void After() {
+				if (Enabled)
+					Feature.Before();
+			}
 		}
 	}
 }

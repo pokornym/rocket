@@ -1,14 +1,18 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
+using Rocket.Engine;
 using Rocket.Engine.OpenGL;
 
 namespace Rocket.Render {
 	public sealed class RenderHandle {
+		public readonly Window Window;
 		public readonly GlProgram Program;
 		private readonly Uniform _uModel;
 		private readonly Uniform _uView;
 		private readonly Uniform _uProjection;
 
-		public RenderHandle(GlProgram program, string mod = "uModel", string view = "uView", string proj = "uProjection") {
+		public RenderHandle(Window win, GlProgram program, string mod = "uModel", string view = "uView", string proj = "uProjection") {
+			Window = win ?? throw new ArgumentNullException(nameof(win));
 			Program = program;
 			_uModel = program.GetUniform(mod);
 			_uView = program.GetUniform(view);

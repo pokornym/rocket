@@ -28,7 +28,7 @@ namespace Rocket.World {
 				}
 
 				// Gravity and collisions
-				Vector2 accel = obj.Acceleration;
+				Vector3 accel = obj.Acceleration;
 				bool col = false;
 				foreach (WorldObject g in _objects) {
 					if (g == obj)
@@ -52,8 +52,8 @@ namespace Rocket.World {
 			}
 		}
 
-		private static Vector2 Gravity(WorldObject from, WorldObject to) {
-			Vector2 dir = to.Position - from.Position;
+		private static Vector3 Gravity(WorldObject from, WorldObject to) {
+			Vector3 dir = to.Position - from.Position;
 			return G_CONSTNAT * to.Mass / dir.LengthSquared * dir.Normalized();
 		}
 

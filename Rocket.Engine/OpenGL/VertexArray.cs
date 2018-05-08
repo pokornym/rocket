@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK.Graphics.OpenGL4;
 
 namespace Rocket.Engine.OpenGL {
@@ -73,6 +74,12 @@ namespace Rocket.Engine.OpenGL {
 
 		public VertexArray(IVertexCoder<TVertex> coder, int count) : base(coder.Layout, count) {
 			_coder = coder;
+		}
+		
+		public VertexArray(IVertexCoder<TVertex> coder, ICollection<TVertex> vtx) : this(coder, vtx.Count) {
+			int i = 0;
+			foreach (TVertex v in vtx)
+				this[i++] = v;
 		}
 
 		public IEnumerator<TVertex> GetEnumerator() {

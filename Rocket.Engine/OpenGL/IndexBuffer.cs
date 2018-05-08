@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL4;
 
 namespace Rocket.Engine.OpenGL {
@@ -9,6 +11,12 @@ namespace Rocket.Engine.OpenGL {
 		public IndexBuffer(int count, IVertexCollection vtx = null) : base(BufferTypes.Index, count * sizeof(uint)) {
 			ElementCount = count;
 			_vtx = vtx;
+		}
+		
+		public IndexBuffer(ICollection<uint> idx, IVertexCollection vtx = null) : this(idx.Count, vtx) {
+			int i = 0;
+			foreach (uint j in idx)
+				this[i++] = j;
 		}
 
 		public void Draw(GeometricPrimitives gp) {
