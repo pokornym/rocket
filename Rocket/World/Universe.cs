@@ -28,7 +28,7 @@ namespace Rocket.World {
 				}
 
 				// Gravity and collisions
-				Vector3 accel = obj.Acceleration;
+				Vector3 accel = (obj.Force / obj.Mass);
 				bool col = false;
 				foreach (WorldObject g in _objects) {
 					if (g == obj)
@@ -49,6 +49,8 @@ namespace Rocket.World {
 				// Dynamics
 				obj.Velocity += accel * delta;
 				obj.Position += obj.Velocity * delta;
+				obj.AngularMomentum += obj.Torque / obj.Mass;
+				obj.Rotation += obj.AngularMomentum;
 			}
 		}
 

@@ -41,8 +41,8 @@ namespace Rocket.World.Objects {
 		}
 
 		public override bool Tick() {
-			_body.Rotation = new Vector3(_body.Rotation.X, _body.Rotation.Y, _body.Rotation.Z + 0.005f);
-			_atmosphere.Rotation = new Vector3(_body.Rotation.X, _body.Rotation.Y, _body.Rotation.Z - 0.01f);;
+			_body.Rotation = new Vector3(_body.Rotation.X, _body.Rotation.Y + 0.002f, _body.Rotation.Z + 0.005f);
+			_atmosphere.Rotation = new Vector3(_body.Rotation.X + 0.02f, _body.Rotation.Y, _body.Rotation.Z - 0.01f);;
 			return true;
 		}
 

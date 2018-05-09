@@ -6,29 +6,31 @@ using Rocket.Render;
 
 namespace Rocket.World {
 	internal abstract class WorldObject : WorldElement {
-		public Vector3 Position {
+		public override Vector3 Position {
 			get => base.Position;
 			set {
 				Transformation.Position = value;
 				base.Position = value;
 			}
 		}
-		public Vector3 Scale {
+		public override Vector3 Scale {
 			get => base.Scale;
-			protected set {
+			set {
 				Transformation.Scale = value;
 				base.Scale = value;
 			}
 		}
-		public Vector3 Rotation {
+		public override Vector3 Rotation {
 			get => base.Rotation;
-			protected set {
+			set {
 				Transformation.Rotation = value;
 				base.Rotation = value;
 			}
 		}
 		public Vector3 Velocity = Vector3.Zero;
-		public Vector3 Acceleration = Vector3.Zero;
+		public Vector3 Force = Vector3.Zero;
+		public Vector3 Torque = Vector3.Zero;
+		public Vector3 AngularMomentum = Vector3.Zero;
 		public float Mass = 1;
 		public readonly Transformation Transformation = new Transformation();
 		public IEnumerable<ModelHandle> Handles => _handels;

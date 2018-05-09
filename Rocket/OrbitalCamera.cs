@@ -26,7 +26,7 @@ namespace Rocket {
 			}
 		}
 		private readonly Camera _cam;
-		private float _dist=100;
+		private float _dist=1;
 		private Vector3 _pivot;
 		private Vector2 _rot;
 

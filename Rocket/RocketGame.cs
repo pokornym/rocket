@@ -18,6 +18,9 @@ namespace Rocket {
 		private const int TARGET_UPS = 30;
 		private const int SPHERE_BREAKUPS = 1;
 		private const string SHADERS_DIR = "shaders";
+		private const float ROTATION_TORQUE = 1f;
+		private const float STABILIZATION_TORQUE = 5f;
+		private const float BOOSTER_FORCE = 5f;
 
 		private readonly VertexCoder _coder = new VertexCoder();
 		private readonly Universe _universe = new Universe();
@@ -62,8 +65,8 @@ namespace Rocket {
 			RenderHandle handle = new RenderHandle(this, program);
 			_layer = new SceneLayer(_universe, handle);
 			AddLayer(_layer);
-			_cam = new OrbitalCamera(_layer.Camera);
-			//			AddLayer(new FuelLayer(_rocket, handle, new RectangleModel(_coder, Color.Red)));
+			_cam = new OrbitalCamera(_layer.Camera) { Distance = 250 };
+			AddLayer(new FuelLayer(_rocket, handle, new RectangleModel(_coder, Color.Red)));
 
 			base.OnInitialize();
 		}
@@ -74,14 +77,25 @@ namespace Rocket {
 		}
 
 		protected override void OnUpdate() {
-			//			if (IsKey(Key.A))
-			//				_rocket.MoveCCW(IsKey(Key.W) ? 2f : 1f);
-			//			else if (IsKey(Key.D))
-			//				_rocket.MoveCW(IsKey(Key.W) ? 2f : 1f);
-			//			else if (IsKey(Key.W))
-			//				_rocket.MoveForward(1f);
-			//			else
-			//				_rocket.StopMovement();
+			_rocket.Force = Vector3.Zero;
+			_rocket.Torque = Vector3.Zero;
+			if (IsKey(Key.W))
+				_rocket.Torque += Vector3.UnitX * ROTATION_TORQUE;
+			if (IsKey(Key.S))
+				_rocket.Torque -= Vector3.UnitX * ROTATION_TORQUE;
+			if (IsKey(Key.D))
+				_rocket.Torque += Vector3.UnitY * ROTATION_TORQUE;
+			if (IsKey(Key.A))
+				_rocket.Torque -= Vector3.UnitY * ROTATION_TORQUE;
+			if (IsKey(Key.E))
+				_rocket.Torque += Vector3.UnitZ * ROTATION_TORQUE;
+			if (IsKey(Key.Q))
+				_rocket.Torque -= Vector3.UnitZ * ROTATION_TORQUE;
+			if (IsKey(Key.X) && _rocket.AngularMomentum.Length > 0)
+				_rocket.Torque -= _rocket.AngularMomentum.Length > 1 ? _rocket.AngularMomentum.Normalized() * STABILIZATION_TORQUE : _rocket.AngularMomentum * STABILIZATION_TORQUE;
+			if (IsKey(Key.Space))
+				_rocket.Force = Rotate(Vector3.UnitZ, _rocket.Rotation) * BOOSTER_FORCE;
+			
 			if (IsKey(Key.Left))
 				_cam.Rotation = new Vector2(_cam.Rotation.X + (float) Math.PI / 180, _cam.Rotation.Y);
 			if (IsKey(Key.Right))
@@ -109,6 +123,26 @@ namespace Rocket {
 		protected override void OnWheel(float delta) {
 			_cam.Distance -= delta * 25;
 			base.OnWheel(delta);
+		}
+
+		private static Vector3 Rotate(Vector3 vec, Vector3 rot) => RotateX(RotateY(RotateZ(vec, rot.Z), rot.Y), rot.X);
+		
+		private static Vector3 RotateX(Vector3 vec, float ang) {
+			float sin = (float)Math.Sin(ang);
+			float cos = (float)Math.Cos(ang);
+			return new Vector3(vec.X, vec.Y * cos + vec.Z * sin, vec.Z * cos - vec.Y * sin);
+		}
+
+		private static Vector3 RotateY(Vector3 vec, float ang) {
+			float sin = (float)Math.Sin(ang);
+			float cos = (float)Math.Cos(ang);
+			return new Vector3(vec.X * cos - vec.Z * sin, vec.Y, vec.X * sin + vec.Z * cos);
+		}
+
+		private static Vector3 RotateZ(Vector3 vec, float ang) {
+			float sin = (float)Math.Sin(ang);
+			float cos = (float)Math.Cos(ang);
+			return new Vector3(vec.X * cos + vec.Y * sin, vec.Y * cos - vec.X * sin, vec.Z);
 		}
 	}
 }
