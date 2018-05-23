@@ -2,7 +2,7 @@
 using OpenTK.Graphics.OpenGL4;
 
 namespace Rocket.Engine.OpenGL {
-	public sealed class ShaderElementType {
+	public sealed class ShaderElementType : IEquatable<ShaderElementType> {
 		public readonly int Dimension;
 		public readonly PrimitiveTypes Type;
 
@@ -13,6 +13,24 @@ namespace Rocket.Engine.OpenGL {
 
 		public override string ToString() {
 			return $"{Type:G}[{Dimension}]";
+		}
+
+		public bool Equals(ShaderElementType other) {
+			if (ReferenceEquals(other, null))
+				return false;
+			return Type == other.Type && Dimension == other.Dimension;
+		}
+
+		public static bool operator ==(ShaderElementType left, ShaderElementType right) {
+			if (ReferenceEquals(left, null) && ReferenceEquals(right, null))
+				return true;
+			return ReferenceEquals(left, null) ? right.Equals(left) : left.Equals(right);
+		}
+
+		public static bool operator !=(ShaderElementType left, ShaderElementType right) {
+			if (ReferenceEquals(left, null) && ReferenceEquals(right, null))
+				return false;
+			return !(ReferenceEquals(left, null) ? right.Equals(left) : left.Equals(right));
 		}
 
 		internal static ShaderElementType FromGl(ActiveAttribType t) {
@@ -70,6 +88,8 @@ namespace Rocket.Engine.OpenGL {
 				set = null;
 				return false;
 			}
+
+
 		}
 	}
 }

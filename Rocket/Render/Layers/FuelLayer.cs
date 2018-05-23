@@ -24,8 +24,9 @@ namespace Rocket.Render.Layers {
 			_ren.Program.Bind();
 
 			_ren.SetProjection(_projection);
+			_ren.SetShade(false);
 
-			_bar.Position = new Vector3(-((float) _w / 2 * 15 / 16),0, 0);
+			_bar.Position = new Vector3(-((float) _w / 2 * 15 / 16), 0, 0);
 			_bar.Scale = new Vector3(8, (float) _h * 3 / 8 * _rocket.Fuel / _rocket.MaxFuel,0);
 
 			_ren.SetView(Matrix4.Identity);

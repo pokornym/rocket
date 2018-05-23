@@ -30,6 +30,7 @@ namespace Rocket.Engine {
 		public event EventHandler<Key> KeyDown;
 		public event EventHandler<Key> KeyUp;
 		public event EventHandler<float> Wheel;
+		protected Color Background = Color.Black;
 		private readonly List<Key> _keys = new List<Key>();
 		private readonly List<FeatureHandle> _features = new List<FeatureHandle>();
 		private readonly List<ILayer> _layers = new List<ILayer>();
@@ -80,7 +81,7 @@ namespace Rocket.Engine {
 		}
 
 		public void Enable<T>() where T : IFeature {
-			foreach (FeatureHandle h in _features.Where(i => i.Feature is T))
+			foreach (FeatureHandle h in _features.Where(i => i.Feature is T && !i.Enabled))
 				h.Attach();
 		}
 
@@ -93,7 +94,7 @@ namespace Rocket.Engine {
 		}
 
 		public void Disable<T>() where T : IFeature {
-			foreach (FeatureHandle h in _features.Where(i => i.Feature is T))
+			foreach (FeatureHandle h in _features.Where(i => i.Feature is T && i.Enabled))
 				h.Detach();
 		}
 		
@@ -125,6 +126,7 @@ namespace Rocket.Engine {
 		protected virtual void OnWheel(float delta) => Wheel?.Invoke(this, delta);
 
 		private void Tesselate() {
+			GL.ClearColor(Background);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
 			foreach (FeatureHandle f in _features)

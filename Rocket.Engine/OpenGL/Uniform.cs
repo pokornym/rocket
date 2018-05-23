@@ -4,6 +4,9 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace Rocket.Engine.OpenGL {
 	public class Uniform {
+		private const byte TRUE = 1;
+		private const byte FALSE = 0;
+
 		private readonly int _location;
 		public readonly string Name;
 		public readonly ShaderElementType Type;
@@ -111,6 +114,26 @@ namespace Rocket.Engine.OpenGL {
 			GL.Uniform4(_location, a, b, c, d);
 		}
 
+		public void Set(bool a) {
+			CheckType(PrimitiveTypes.Bool, 1);
+			GL.Uniform1(_location, a ? TRUE : FALSE);
+		}
+
+		public void Set(bool a, bool b) {
+			CheckType(PrimitiveTypes.Bool, 2);
+			GL.Uniform2(_location, a ? TRUE : FALSE, b ? TRUE : FALSE);
+		}
+
+		public void Set(bool a, bool b, bool c) {
+			CheckType(PrimitiveTypes.Bool, 3);
+			GL.Uniform3(_location, a ? TRUE : FALSE, b ? TRUE : FALSE, c ? TRUE : FALSE);
+		}
+
+		public void Set(bool a, bool b, bool c, bool d) {
+			CheckType(PrimitiveTypes.Bool, 4);
+			GL.Uniform4(_location, a ? TRUE : FALSE, b ? TRUE : FALSE, c ? TRUE : FALSE, d ? TRUE : FALSE);
+		}
+
 		public void Set(Matrix2 mat, bool trans = false) {
 			CheckType(PrimitiveTypes.Matrix, 2);
 			GL.UniformMatrix2(_location, trans, ref mat);
@@ -131,13 +154,17 @@ namespace Rocket.Engine.OpenGL {
 			GL.Uniform1(_location, unit.Slot);
 		}
 
+		public void EnsureType(ShaderElementType expect) {
+			if (Type != expect)
+				throw new TypeMismatchException(expect, Type);
+		}
+
 		public override string ToString() {
 			return $"{Type} {Name}";
 		}
 
 		private void CheckType(PrimitiveTypes type, int dim) {
-			if (Type.Type != type || Type.Dimension != dim)
-				throw new TypeMismatchException(Type, new ShaderElementType(type, dim));
+			EnsureType(new ShaderElementType(type, dim));
 		}
 	}
 }

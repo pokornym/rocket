@@ -1,11 +1,15 @@
-﻿namespace Rocket.Engine {
+﻿using System;
+using Rocket.Engine.Geometry;
+using Rocket.Engine.OpenGL;
+
+namespace Rocket.Engine {
 	public abstract class Model {
 		public bool IsTransparent { get; protected set; }
-		protected abstract Face[] Faces { get; }
+		protected abstract IVertexRenderer Vertices { get; }
+		private readonly GeometricPrimitives _primitive;
 
-		public void Draw() {
-			foreach (Face f in Faces)
-				f.Draw();
-		}
+		public Model(GeometricPrimitives prim = GeometricPrimitives.Triangles) => _primitive = prim;
+
+		public void Draw() => Vertices?.Draw(_primitive);
 	}
 }

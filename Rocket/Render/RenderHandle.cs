@@ -10,21 +10,23 @@ namespace Rocket.Render {
 		private readonly Uniform _uModel;
 		private readonly Uniform _uView;
 		private readonly Uniform _uProjection;
+		private readonly Uniform _uShade;
 
-		public RenderHandle(Window win, GlProgram program, string mod = "uModel", string view = "uView", string proj = "uProjection") {
+		public RenderHandle(Window win, GlProgram program, string mod = "uModel", string view = "uView", string proj = "uProjection",  string shade = "uShade") {
 			Window = win ?? throw new ArgumentNullException(nameof(win));
 			Program = program;
 			_uModel = program.GetUniform(mod);
 			_uView = program.GetUniform(view);
 			_uProjection = program.GetUniform(proj);
-			
-			if (_uModel.Type.Type != PrimitiveTypes.Matrix || _uModel.Type.Dimension != 4)
-				throw new TypeMismatchException(new ShaderElementType(PrimitiveTypes.Matrix, 4), _uModel.Type);
-			if (_uView.Type.Type != PrimitiveTypes.Matrix || _uView.Type.Dimension != 4)
-				throw new TypeMismatchException(new ShaderElementType(PrimitiveTypes.Matrix, 4), _uView.Type);
-			if (_uProjection.Type.Type != PrimitiveTypes.Matrix || _uProjection.Type.Dimension != 4)
-				throw new TypeMismatchException(new ShaderElementType(PrimitiveTypes.Matrix, 4), _uProjection.Type);
+			_uShade = program.GetUniform(shade);
+
+			_uModel.EnsureType(new ShaderElementType(PrimitiveTypes.Matrix, 4));
+			_uView.EnsureType(new ShaderElementType(PrimitiveTypes.Matrix, 4));
+			_uProjection.EnsureType(new ShaderElementType(PrimitiveTypes.Matrix, 4));
+			_uShade.EnsureType(new ShaderElementType(PrimitiveTypes.Bool, 1));
 		}
+
+		public void SetShade(bool b) => _uShade.Set(b);
 
 		public void SetModel(Matrix4 mtx) => _uModel.Set(mtx);
 		

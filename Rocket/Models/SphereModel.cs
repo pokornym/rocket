@@ -8,8 +8,7 @@ using Rocket.Render;
 
 namespace Rocket.Models {
 	internal class SphereModel : Model {
-		protected override Face[] Faces { get; }
-		private readonly VertexArray<Vertex> _vertices;
+		protected override IVertexRenderer Vertices => _indices;
 		private readonly IndexBuffer _indices;
 
 		public SphereModel(IVertexCoder<Vertex> coder, int bups, Color c, bool trans = false) {
@@ -35,27 +34,9 @@ namespace Rocket.Models {
 				}
 			}
 
-			List<Vertex> vertices = new List<Vertex>();
-			foreach (Vector3 v in triangles.SelectMany(i => i.GetVertices())) {
-				if (vertices.All(i => i.Position != v))
-					vertices.Add(new Vertex(v, c, Vector2.Zero)); // TODO: UV
-			}
-
-			_vertices = new VertexArray<Vertex>(coder, vertices);
-
-			List<uint> idx = new List<uint>();
-			foreach (Triangle t in triangles) {
-				foreach (Vector3 v in t.GetVertices()) {
-					for (int i = 0; i < vertices.Count; i++)
-						if (vertices[i].Position == v) {
-							idx.Add((uint) i);
-							break;
-						}
-				}
-			}
-
-			_indices = new IndexBuffer(idx, _vertices);
-			Faces = new[] { new Face(_indices, GeometricPrimitives.Triangles) };
+			SimpleMesh mesh = new SimpleMesh(c);
+			mesh.AddRange(triangles.Select(i => new Engine.Geometry.Triangle(i.A, i.B, i.C)));
+			_indices = mesh.ToBuffer(coder);
 		}
 
 		private sealed class Triangle {
@@ -71,7 +52,7 @@ namespace Rocket.Models {
 
 			public Triangle RotateZ(float sin, float cos) => new Triangle(RotateZ(A, sin, cos), RotateZ(B, sin, cos), RotateZ(C, sin, cos));
 
-			public Triangle FlipZ() => new Triangle(FlipZ(A), FlipZ(B), FlipZ(C));
+			public Triangle FlipZ() => new Triangle(FlipZ(C), FlipZ(B), FlipZ(A));
 
 			public IEnumerable<Triangle> BreakUp() {
 				Vector3 ab = HalfVector(A, B).Normalized();
@@ -82,12 +63,6 @@ namespace Rocket.Models {
 				yield return new Triangle(ab, B, bc);
 				yield return new Triangle(ab, bc, ac);
 				yield return new Triangle(ac, bc, C);
-			}
-
-			public IEnumerable<Vector3> GetVertices() {
-				yield return A;
-				yield return B;
-				yield return C;
 			}
 
 			private static Vector3 RotateZ(Vector3 v, float sin, float cos) => new Vector3(cos * v.X - sin * v.Y, sin * v.X + cos * v.Y, v.Z);

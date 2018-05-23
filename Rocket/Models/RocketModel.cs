@@ -6,7 +6,7 @@ using Rocket.Engine.OpenGL;
 using Rocket.Render;
 
 namespace Rocket.Models {
-	internal sealed class RocketModel : Model {
+	/*internal sealed class RocketModel : Model {
 		private static readonly float COS_HPI = (float)Math.Cos(Math.PI / 2);
 		private static readonly float SIN_HPI = (float)Math.Sin(Math.PI / 2);
 		protected override Face[] Faces { get; }
@@ -29,7 +29,7 @@ namespace Rocket.Models {
 				new Vector3(1f / 3,0, -1f),
 				new Vector3(2f / 3,0, -1f)
 			}, Color.Orange, coder), GeometricPrimitives.Triangles);
-			Faces[3] = new Face(new VertexArray<Vertex>(coder, new List<Vertex>() {
+			Faces[3] = new Face(new VertexArray<Vertex>(coder, new List<Vertex> {
 				new Vertex(new Vector3(1f / 3, -1f / 3, -1f), Color.Blue, Vector2.Zero),
 				new Vertex(new Vector3(-1f / 3, -1f / 3, -1f), Color.Blue, Vector2.Zero),
 				new Vertex(new Vector3(-1f / 3, 1f / 3, -1f), Color.Blue, Vector2.Zero),
@@ -59,5 +59,5 @@ namespace Rocket.Models {
 				buff[i] = new Vector3(COS_HPI * v.X - SIN_HPI * v.Y, SIN_HPI * v.X + COS_HPI * v.Y, v.Z);
 			}
 		}
-	}
+	}*/
 }

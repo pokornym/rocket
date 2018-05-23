@@ -9,9 +9,9 @@ namespace Rocket.World.Objects {
 		public float Fuel { get; private set; }
 		public readonly float MaxFuel;
 		private readonly ModelHandle _model;
-		private const float BASE_MASS = 10;
+		private const float BASE_MASS = 5;
 		
-		public RocketObject(float s, Model m, float f = 500) : base(false, Vector3.One, new CircleCollider()) {
+		public RocketObject(float s, Model m, float f = 5000) : base(false, Vector3.One, new CircleCollider()) {
 			_model = Attach(m);
 			Scale = s * Vector3.One;
 			MaxFuel = f;
@@ -27,7 +27,7 @@ namespace Rocket.World.Objects {
 				Fuel = Math.Max(Fuel - Torque.Length, 0);
 			}
 
-			Mass = BASE_MASS + Fuel * 0.5f;
+			Mass = BASE_MASS + Fuel * 0.05f;
 
 			return base.Tick();
 		}

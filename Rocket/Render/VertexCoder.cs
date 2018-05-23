@@ -5,7 +5,7 @@ using Rocket.Engine.OpenGL;
 
 namespace Rocket.Render {
 	internal sealed class VertexCoder : IVertexCoder<Vertex> {
-		public const int SIZE = sizeof(float) * 5 + sizeof(byte) * 4;
+		public const int SIZE = sizeof(float) * 8 + sizeof(byte) * 4;
 		
 		public VertexLayout Layout { get; }
 
@@ -14,6 +14,7 @@ namespace Rocket.Render {
 			Layout.AddFloat("Position", 3);
 			Layout.AddByte("Color", 4, true);
 			Layout.AddFloat("UV", 2);
+			Layout.AddFloat("Normal", 3);
 		}
 
 		public Vertex FromBytes(Stream str) {
@@ -32,9 +33,10 @@ namespace Rocket.Render {
 						vtx[sizeof(float) * 3 + 2],
 						vtx[sizeof(float) * 3 + 3]
 					),
-					new Vector2(
-						BitConverter.ToSingle(vtx, sizeof(float) * 3 + 4),
-						BitConverter.ToSingle(vtx, sizeof(float) * 4 + 4)
+					new Vector3(
+						BitConverter.ToSingle(vtx, sizeof(float) * 5 + 4),
+						BitConverter.ToSingle(vtx, sizeof(float) * 6 + 4),
+						BitConverter.ToSingle(vtx, sizeof(float) * 7 + 4)
 					)
 				);
 		}
@@ -53,8 +55,14 @@ namespace Rocket.Render {
 			buffer[sizeof(float) * 3 + 3] = vtx.Color.A;
 
 			// UV
-			Array.Copy(BitConverter.GetBytes(vtx.UV.X), 0, buffer, sizeof(float) * 3 + 4, sizeof(float));
-			Array.Copy(BitConverter.GetBytes(vtx.UV.Y), 0, buffer, sizeof(float) * 4 + 4, sizeof(float));
+			Array.Copy(BitConverter.GetBytes(0f), 0, buffer, sizeof(float) * 3 + 4, sizeof(float));
+			Array.Copy(BitConverter.GetBytes(0f), 0, buffer, sizeof(float) * 4 + 4, sizeof(float));
+
+			// Normals
+			Array.Copy(BitConverter.GetBytes(vtx.Normal.X), 0, buffer, sizeof(float) * 5 + 4, sizeof(float));
+			Array.Copy(BitConverter.GetBytes(vtx.Normal.Y), 0, buffer, sizeof(float) * 6 + 4, sizeof(float));
+			Array.Copy(BitConverter.GetBytes(vtx.Normal.Z), 0, buffer, sizeof(float) * 7 + 4, sizeof(float));
+
 			str.Write(buffer, 0, buffer.Length);
 		}
 	}

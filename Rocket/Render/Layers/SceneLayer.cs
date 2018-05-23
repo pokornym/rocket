@@ -17,32 +17,32 @@ namespace Rocket.Render.Layers {
 			_ren = ren ?? throw new ArgumentNullException(nameof(ren));
 		}
 
-		public void Resize(int w, int h) => _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, (float) w / h, 1, 1000000);
+		public void Resize(int w, int h) => _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, (float)w / h, 1, 1000000);
 
 		public void Render() {
 			_ren.Program.Bind();
 
 			_ren.SetProjection(_projection);
 			_ren.SetView(Camera.Matrix);
-			
-			foreach (WorldObject obj in Universe) {
+
+			foreach (WorldObject obj in Universe.OrderByDescending(i => (i.Position - Camera.Position).LengthSquared)) {
+				_ren.SetShade(true);
 				foreach (ModelHandle h in obj.Handles.Where(i => !i.Model.IsTransparent)) {
 					_ren.SetModel(h.Transformation + obj.Transformation);
 
 					h.Draw();
 				}
-			}
-			
-			_ren.Window.Disable<DepthFeature>();
-			foreach (WorldObject obj in Universe) {
+
+//				_ren.SetShade(false);
+				_ren.Window.Disable<DepthFeature>();
 				foreach (ModelHandle h in obj.Handles.Where(i => i.Model.IsTransparent)) {
 					_ren.SetModel(h.Transformation + obj.Transformation);
 
 					h.Draw();
 				}
+				_ren.Window.Enable<DepthFeature>();
 			}
-			_ren.Window.Enable<DepthFeature>();
-			
+
 			_ren.Program.Unbind();
 		}
 	}
