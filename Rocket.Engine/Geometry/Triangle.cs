@@ -15,6 +15,7 @@ namespace Rocket.Engine.Geometry {
 			A = a;
 			B = b;
 			C = c;
+			
 		}
 		
 		public IEnumerable<Triangle> BreakUp() {
@@ -27,6 +28,8 @@ namespace Rocket.Engine.Geometry {
 			yield return new Triangle(ab, bc, ac);
 			yield return new Triangle(ac, bc, C);
 		}
+		
+		public Triangle Reverse() => new Triangle(C, B, A);
 
 		public IEnumerator<Vector3> GetEnumerator() {
 			return Enumerator().GetEnumerator();

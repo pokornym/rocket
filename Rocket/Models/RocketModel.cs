@@ -1,63 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using Rocket.Engine;
+using Rocket.Engine.Geometry;
 using Rocket.Engine.OpenGL;
 using Rocket.Render;
 
 namespace Rocket.Models {
-	/*internal sealed class RocketModel : Model {
-		private static readonly float COS_HPI = (float)Math.Cos(Math.PI / 2);
-		private static readonly float SIN_HPI = (float)Math.Sin(Math.PI / 2);
-		protected override Face[] Faces { get; }
+	internal sealed class RocketModel : Model {
+		protected override IVertexRenderer Vertices => _bfr;
+		private readonly IndexBuffer _bfr;
 
 		public RocketModel(IVertexCoder<Vertex> coder) {
-			Faces = new Face[4];
-			Faces[0] = new Face(Compose(new[] {
+			SimpleMesh mesh = new SimpleMesh();
+			mesh.AddRange(Compose(new Triangle(
 				new Vector3(0, 0, 1),
 				new Vector3(1f / 3, -1f / 3, 1f / 3),
 				new Vector3(1f / 3, 1f / 3, 1f / 3)
-			}, Color.IndianRed, coder), GeometricPrimitives.Triangles);
-			Faces[1] = new Face(Compose(new[] {
+			)));
+			mesh.AddRange(Compose(Mesh.Quad(
 				new Vector3(1f / 3, -1f / 3, 1f / 3),
 				new Vector3(1f / 3, -1f / 3, -1),
 				new Vector3(1f / 3, 1f / 3, -1),
 				new Vector3(1f / 3, 1f / 3, 1f / 3)
-			}, Color.Blue, coder), GeometricPrimitives.Quads);
-			Faces[2] = new Face(Compose(new[] {
-				new Vector3(1f / 3,0, -1f / 3),
-				new Vector3(1f / 3,0, -1f),
-				new Vector3(2f / 3,0, -1f)
-			}, Color.Orange, coder), GeometricPrimitives.Triangles);
-			Faces[3] = new Face(new VertexArray<Vertex>(coder, new List<Vertex> {
-				new Vertex(new Vector3(1f / 3, -1f / 3, -1f), Color.Blue, Vector2.Zero),
-				new Vertex(new Vector3(-1f / 3, -1f / 3, -1f), Color.Blue, Vector2.Zero),
-				new Vertex(new Vector3(-1f / 3, 1f / 3, -1f), Color.Blue, Vector2.Zero),
-				new Vertex(new Vector3(1f / 3, 1f / 3, -1f), Color.Blue, Vector2.Zero)
-			}), GeometricPrimitives.Quads);
+			)));
+			mesh.AddRange(Compose(new Triangle(
+				new Vector3(1f / 3, 0, -1f / 3),
+				new Vector3(1f / 3, 0, -1f),
+				new Vector3(2f / 3, 0, -1f)
+			)));
+			mesh.AddRange(Mesh.Quad(
+				new Vector3(1f / 3, -1f / 3, -1f),
+				new Vector3(-1f / 3, -1f / 3, -1f),
+				new Vector3(-1f / 3, 1f / 3, -1f),
+				new Vector3(1f / 3, 1f / 3, -1f)
+			));
+			_bfr = mesh.ToBuffer(coder);
 		}
 
-		private static VertexArray<Vertex> Compose(Vector3[] buff, Color col, IVertexCoder<Vertex> coder) {
-			int offset = 0;
-			VertexArray<Vertex> vtx = new VertexArray<Vertex>(coder, buff.Length * 4);
-			for (int i = 0; i < 4; i++) {
-				Vertices(buff);
-				Rotate(ref buff);
-			}
-
-			return vtx;
-
-			void Vertices(IEnumerable<Vector3> vec) {
-				foreach (Vector3 v in vec)
-					vtx[offset++] = new Vertex(v, col, Vector2.Zero);
-			}
+		private static IEnumerable<Triangle> Compose(IEnumerable<Triangle> tri) {
+			foreach (Triangle t in tri.SelectMany(Compose))
+				yield return t;
 		}
 
-		private static void Rotate(ref Vector3[] buff) {
-			for (int i = 0; i < buff.Length; i++) {
-				Vector3 v = buff[i];
-				buff[i] = new Vector3(COS_HPI * v.X - SIN_HPI * v.Y, SIN_HPI * v.X + COS_HPI * v.Y, v.Z);
+		private static IEnumerable<Triangle> Compose(Triangle t) {
+			yield return t;
+			for (int i = 1; i <= 3; i++) {
+				float cos = (float)Math.Cos(i * Math.PI / 2);
+				float sin = (float)Math.Sin(i * Math.PI / 2);
+				Vector3[] vec = t.Select(v => new Vector3(cos * v.X - sin * v.Y, sin * v.X + cos * v.Y, v.Z)).ToArray();
+				yield return new Triangle(vec[0], vec[1], vec[2]);
 			}
 		}
-	}*/
+	}
 }

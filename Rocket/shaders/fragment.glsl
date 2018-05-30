@@ -1,23 +1,39 @@
 #version 330
 
-in vec4 fColor;
-in vec2 fUV;
+struct Material {
+	vec4 color;
+	float ambient;
+	float diffusion;
+};
+
+struct LightData {
+	vec4 position;
+	vec3 color;
+	float intensity;
+};
+
 in vec4 fPosition;
 in vec4 fNormal;
+in LightData fLight[8];
 
 uniform bool uShade;
+uniform Material uMaterial;
+uniform int uLightCount;
 
 out vec4 color;
 
 void main() {
-	vec3 rgb = fColor.rgb;
+	vec3 rgb = uMaterial.color.rgb;
 	
 	if (uShade) {
-		vec4 camera = vec4(0.0, 0.0, 0.0, 1);
-		vec4 l = camera - fPosition;
-		float diff = clamp(dot(fNormal, l), 0, 1);
-		rgb = (rgb * 0.1) + rgb * 250 * diff / length(l);
+		for (int i = 0; i < uLightCount; i++) {
+			if (fLight[i].intensity == 0)
+				continue;
+			vec4 l = fLight[i].position - fPosition;
+      float diff = clamp(dot(fNormal, normalize(l)), 0, 1);
+      rgb *= uMaterial.ambient + fLight[i].color * uMaterial.diffusion * diff / (length(l) / (fLight[i].intensity * 100));
+		}
 	}
 
-	color = vec4(rgb, fColor.a);
+	color = vec4(rgb, uMaterial.color.a);
 }

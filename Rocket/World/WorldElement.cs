@@ -13,6 +13,8 @@ namespace Rocket.World {
 				float Normalize(float v) => v < 0 ? ((float) Math.PI * 2) + (v % ((float) Math.PI * 2)) : v % ((float) Math.PI * 2);
 			}
 		}
+		public Light? Light { get; protected set; }
+		public LightSource? LightSource => Light == null ? null : (LightSource?) new LightSource { Light = Light.Value, Position = Position };
 		public readonly ICollider Collider;
 		private Vector3 _rotation = Vector3.Zero;
 

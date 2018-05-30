@@ -55,6 +55,12 @@ namespace Rocket.World {
 			return handle;
 		}
 
+		protected ModelHandle Attach(Model mod, Material mat) {
+			ModelHandle handle = new ModelHandle(mod, mat);
+			_handels.Add(handle);
+			return handle;
+		}
+
 		protected void Detach(ModelHandle handle) => _handels.Remove(handle);
 	}
 }

@@ -4,7 +4,6 @@ using Rocket.Engine.OpenGL;
 
 namespace Rocket.Engine {
 	public abstract class Model {
-		public bool IsTransparent { get; protected set; }
 		protected abstract IVertexRenderer Vertices { get; }
 		private readonly GeometricPrimitives _primitive;
 

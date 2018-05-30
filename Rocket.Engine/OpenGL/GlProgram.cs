@@ -25,21 +25,18 @@ namespace Rocket.Engine.OpenGL {
 			Create();
 
 			GL.GetProgram(Id.Value, GetProgramParameterName.ActiveUniforms, out int uniforms);
-			List<Uniform> unis = new List<Uniform>();
+			Uniforms = new Uniform[uniforms];
 			for (int i = 0; i < uniforms; i++) {
 				string name = GL.GetActiveUniform(Id.Value, i, out int size, out ActiveUniformType type);
-				unis.Add(new Uniform(name, ShaderElementType.FromGl(type), GL.GetUniformLocation(Id.Value, name)));
+				Uniforms[i] = new Uniform(name, ShaderElementType.FromGl(type), GL.GetUniformLocation(Id.Value, name));
 			}
 
 			GL.GetProgram(Id.Value, GetProgramParameterName.ActiveAttributes, out int attribs);
-			List<ShaderAttribute> att = new List<ShaderAttribute>();
+			Attributes = new ShaderAttribute[attribs];
 			for (int i = 0; i < attribs; i++) {
 				string name = GL.GetActiveAttrib(Id.Value, i, out int size, out ActiveAttribType type);
-				att.Add(new ShaderAttribute(name, ShaderElementType.FromGl(type), GL.GetAttribLocation(Id.Value, name)));
+				Attributes[i] = new ShaderAttribute(name, ShaderElementType.FromGl(type), GL.GetAttribLocation(Id.Value, name));
 			}
-
-			Attributes = att.ToArray();
-			Uniforms = unis.ToArray();
 		}
 
 		public Uniform GetUniform(string name) {
@@ -63,10 +60,15 @@ namespace Rocket.Engine.OpenGL {
 			foreach (Shader sh in _shaders)
 				GL.AttachShader(id, sh.Id.Value);
 			GL.LinkProgram(id);
+			GL.GetProgram(id, GetProgramParameterName.LinkStatus, out int link);
+			if (link == 0) {
+				string lderr = GL.GetProgramInfoLog(id);
+				throw new GlProgramException(this, $"Linkage failed!: {lderr}");
+			}
 			GL.ValidateProgram(id);
-			string err = GL.GetProgramInfoLog(id);
-			if (!string.IsNullOrWhiteSpace(err))
-				throw new GlProgramException(this, err);
+			string cerr = GL.GetProgramInfoLog(id);
+			if (!string.IsNullOrWhiteSpace(cerr))
+				throw new GlProgramException(this, $"Compilation error!: {cerr}");
 			return id;
 		}
 

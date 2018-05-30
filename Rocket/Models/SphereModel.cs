@@ -11,8 +11,7 @@ namespace Rocket.Models {
 		protected override IVertexRenderer Vertices => _indices;
 		private readonly IndexBuffer _indices;
 
-		public SphereModel(IVertexCoder<Vertex> coder, int bups, Color c, bool trans = false) {
-			IsTransparent = trans;
+		public SphereModel(IVertexCoder<Vertex> coder, int bups) {
 			List<Triangle> triangles = new List<Triangle> { new Triangle(new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)) };
 			for (int i = 0; i < bups; i++)
 				for (int j = triangles.Count - 1; j >= 0; j--) {
@@ -34,7 +33,7 @@ namespace Rocket.Models {
 				}
 			}
 
-			SimpleMesh mesh = new SimpleMesh(c);
+			SimpleMesh mesh = new SimpleMesh();
 			mesh.AddRange(triangles.Select(i => new Engine.Geometry.Triangle(i.A, i.B, i.C)));
 			_indices = mesh.ToBuffer(coder);
 		}

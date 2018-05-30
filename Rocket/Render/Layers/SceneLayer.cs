@@ -17,29 +17,30 @@ namespace Rocket.Render.Layers {
 			_ren = ren ?? throw new ArgumentNullException(nameof(ren));
 		}
 
-		public void Resize(int w, int h) => _projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, (float)w / h, 1, 1000000);
+		public void Resize(int w, int h) => _projection = Matrix4.CreatePerspectiveFieldOfView((float) Math.PI / 4, (float) w / h, 1, 1000000);
 
 		public void Render() {
 			_ren.Program.Bind();
 
 			_ren.SetProjection(_projection);
 			_ren.SetView(Camera.Matrix);
+			_ren.SetLights(Universe.Where(i => i.LightSource != null).Select(i => i.LightSource.Value));
 
 			foreach (WorldObject obj in Universe.OrderByDescending(i => (i.Position - Camera.Position).LengthSquared)) {
-				_ren.SetShade(true);
-				foreach (ModelHandle h in obj.Handles.Where(i => !i.Model.IsTransparent)) {
+				_ren.SetShade(obj.Light == null);
+				foreach (ModelHandle h in obj.Handles.Where(i => i.Material.Color.W >= 1)) {
 					_ren.SetModel(h.Transformation + obj.Transformation);
 
-					h.Draw();
+					_ren.RenderModel(h);
 				}
 
-//				_ren.SetShade(false);
 				_ren.Window.Disable<DepthFeature>();
-				foreach (ModelHandle h in obj.Handles.Where(i => i.Model.IsTransparent)) {
+				foreach (ModelHandle h in obj.Handles.Where(i => i.Material.Color.W < 1)) {
 					_ren.SetModel(h.Transformation + obj.Transformation);
 
-					h.Draw();
+					_ren.RenderModel(h);
 				}
+
 				_ren.Window.Enable<DepthFeature>();
 			}
 

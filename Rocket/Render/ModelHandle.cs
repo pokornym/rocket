@@ -1,7 +1,9 @@
 ﻿using System;
 using OpenTK;
+using Rocket.Engine;
+using Rocket.World;
 
-namespace Rocket.Engine {
+namespace Rocket.Render {
 	public sealed class ModelHandle {
 		public Vector3 Position {
 			get => Transformation.Position;
@@ -15,11 +17,15 @@ namespace Rocket.Engine {
 			get => Transformation.Scale;
 			set => Transformation.Scale = value;
 		}
-		public readonly Model Model;
 		public readonly Transformation Transformation = new Transformation();
+		public readonly Model Model;
+		public Material Material;
 
 		public ModelHandle(Model mod) => Model = mod ?? throw new ArgumentNullException(nameof(mod));
 
-		public void Draw() => Model.Draw();
+		public ModelHandle(Model mod, Material mat) {
+			Model = mod ?? throw new ArgumentNullException(nameof(mod));
+			Material = mat;
+		}
 	}
 }

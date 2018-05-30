@@ -25,12 +25,19 @@ namespace Rocket.World.Objects {
 		private readonly ModelHandle _atmosphere;
 		private readonly float _atRatio;
 
-		public SpaceObject(float a, float m, Model body, Model atm) : base(true, Vector3.One, new CircleCollider()) {
+		public SpaceObject(float a, float m, Model sph) : base(true, Vector3.One, new CircleCollider()) {
 			Mass = m;
-			_body = Attach(body);
+			_body = Attach(sph, new Material { Color = new Vector4(0, 1, 0, 1) });
 			_body.Scale = Vector3.One;
-			_atmosphere = Attach(atm);
-			_atmosphere.Scale = new Vector3(_atRatio = a);
+			_atRatio = a;
+			if (_atRatio > 1) {
+				_atmosphere = Attach(sph, new Material { Color = new Vector4(0.3f, 0.3f, 1f, 0.5f), Ambient = 0.1f, Diffusion = 5f });
+				_atmosphere.Scale = new Vector3(_atRatio);
+			}
+
+			if (Mass > 10000)
+				Light = new Light { Color = Vector3.One, Intensity = 100f };
+
 			SetProperties();
 		}
 
@@ -42,7 +49,8 @@ namespace Rocket.World.Objects {
 
 		public override bool Tick() {
 			_body.Rotation = new Vector3(_body.Rotation.X, _body.Rotation.Y + 0.002f, _body.Rotation.Z + 0.005f);
-			_atmosphere.Rotation = new Vector3(_body.Rotation.X + 0.02f, _body.Rotation.Y, _body.Rotation.Z - 0.01f);;
+			if (_atmosphere != null)
+				_atmosphere.Rotation = new Vector3(_body.Rotation.X + 0.02f, _body.Rotation.Y, _body.Rotation.Z - 0.01f);
 			return true;
 		}
 

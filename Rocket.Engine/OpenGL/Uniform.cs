@@ -160,7 +160,7 @@ namespace Rocket.Engine.OpenGL {
 		}
 
 		public override string ToString() {
-			return $"{Type} {Name}";
+			return $"{Name} : {Type}";
 		}
 
 		private void CheckType(PrimitiveTypes type, int dim) {

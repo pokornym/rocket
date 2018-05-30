@@ -1,6 +1,7 @@
 ﻿using System;
 using OpenTK;
 using Rocket.Engine;
+using Rocket.World;
 using Rocket.World.Objects;
 
 namespace Rocket.Render.Layers {
@@ -15,7 +16,9 @@ namespace Rocket.Render.Layers {
 		public FuelLayer(RocketObject r, RenderHandle ren, Model m) {
 			_rocket = r ?? throw new ArgumentNullException(nameof(r));
 			_ren = ren ?? throw new ArgumentNullException(nameof(ren));
-			_bar = new ModelHandle(m ?? throw new ArgumentNullException(nameof(m)));
+			_bar = new ModelHandle(m ?? throw new ArgumentNullException(nameof(m))) {
+				Material = new Material { Color = new Vector4(1, 0, 0, 1) }
+			};
 		}
 
 		public void Resize(int w, int h) => _projection = Matrix4.CreateOrthographic(_w = w, _h = h, -100, 100);
@@ -27,12 +30,12 @@ namespace Rocket.Render.Layers {
 			_ren.SetShade(false);
 
 			_bar.Position = new Vector3(-((float) _w / 2 * 15 / 16), 0, 0);
-			_bar.Scale = new Vector3(8, (float) _h * 3 / 8 * _rocket.Fuel / _rocket.MaxFuel,0);
+			_bar.Scale = new Vector3(8, (float) _h * 3 / 8 * _rocket.Fuel / _rocket.MaxFuel, 0);
 
 			_ren.SetView(Matrix4.Identity);
 			_ren.SetModel(_bar.Transformation.Matrix * Matrix4.CreateTranslation(0, 0, 0.1f));
 
-			_bar.Draw();
+			_ren.RenderModel(_bar);
 
 			_ren.Program.Unbind();
 		}

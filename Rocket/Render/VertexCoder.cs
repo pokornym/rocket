@@ -27,16 +27,10 @@ namespace Rocket.Render {
 						BitConverter.ToSingle(vtx, sizeof(float)),
 						BitConverter.ToSingle(vtx, sizeof(float) * 2)
 					),
-					new Color(
-						vtx[sizeof(float) * 3],
-						vtx[sizeof(float) * 3 + 1],
-						vtx[sizeof(float) * 3 + 2],
-						vtx[sizeof(float) * 3 + 3]
-					),
 					new Vector3(
-						BitConverter.ToSingle(vtx, sizeof(float) * 5 + 4),
-						BitConverter.ToSingle(vtx, sizeof(float) * 6 + 4),
-						BitConverter.ToSingle(vtx, sizeof(float) * 7 + 4)
+						BitConverter.ToSingle(vtx, sizeof(float) * 3),
+						BitConverter.ToSingle(vtx, sizeof(float) * 4),
+						BitConverter.ToSingle(vtx, sizeof(float) * 5)
 					)
 				);
 		}
@@ -48,20 +42,10 @@ namespace Rocket.Render {
 			Array.Copy(BitConverter.GetBytes(vtx.Position.Y), 0, buffer, sizeof(float), sizeof(float));
 			Array.Copy(BitConverter.GetBytes(vtx.Position.Z), 0, buffer, sizeof(float) * 2, sizeof(float));
 
-			// Color
-			buffer[sizeof(float) * 3] = vtx.Color.R;
-			buffer[sizeof(float) * 3 + 1] = vtx.Color.G;
-			buffer[sizeof(float) * 3 + 2] = vtx.Color.B;
-			buffer[sizeof(float) * 3 + 3] = vtx.Color.A;
-
-			// UV
-			Array.Copy(BitConverter.GetBytes(0f), 0, buffer, sizeof(float) * 3 + 4, sizeof(float));
-			Array.Copy(BitConverter.GetBytes(0f), 0, buffer, sizeof(float) * 4 + 4, sizeof(float));
-
-			// Normals
-			Array.Copy(BitConverter.GetBytes(vtx.Normal.X), 0, buffer, sizeof(float) * 5 + 4, sizeof(float));
-			Array.Copy(BitConverter.GetBytes(vtx.Normal.Y), 0, buffer, sizeof(float) * 6 + 4, sizeof(float));
-			Array.Copy(BitConverter.GetBytes(vtx.Normal.Z), 0, buffer, sizeof(float) * 7 + 4, sizeof(float));
+			// Normal
+			Array.Copy(BitConverter.GetBytes(vtx.Normal.X), 0, buffer, sizeof(float) * 3, sizeof(float));
+			Array.Copy(BitConverter.GetBytes(vtx.Normal.Y), 0, buffer, sizeof(float) * 4, sizeof(float));
+			Array.Copy(BitConverter.GetBytes(vtx.Normal.Z), 0, buffer, sizeof(float) * 5, sizeof(float));
 
 			str.Write(buffer, 0, buffer.Length);
 		}
