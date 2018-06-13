@@ -1,5 +1,5 @@
 ﻿namespace Rocket.Engine.OpenGL {
-	internal interface IPixelReader {
+	public interface IPixelReader {
 		int Width { get; }
 		int Height { get; }
 

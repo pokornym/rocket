@@ -10,9 +10,9 @@ namespace Rocket.Engine.OpenGL {
 
 		public IndexBuffer(int count, IVertexCollection vtx = null) : base(BufferTypes.Index, count * sizeof(uint)) {
 			ElementCount = count;
-			_vtx = vtx;
+			_vtx = vtx ?? throw new ArgumentNullException(nameof(vtx));
 		}
-		
+
 		public IndexBuffer(ICollection<uint> idx, IVertexCollection vtx = null) : this(idx.Count, vtx) {
 			int i = 0;
 			foreach (uint j in idx)

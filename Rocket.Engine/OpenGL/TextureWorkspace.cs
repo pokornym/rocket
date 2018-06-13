@@ -2,7 +2,7 @@
 using OpenTK.Graphics.OpenGL4;
 
 namespace Rocket.Engine.OpenGL {
-	internal sealed class TextureWorkspace {
+	public sealed class TextureWorkspace {
 		private readonly Texture[] _slots;
 		public readonly int Slots;
 

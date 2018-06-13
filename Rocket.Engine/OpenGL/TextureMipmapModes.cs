@@ -1,5 +1,5 @@
 ﻿namespace Rocket.Engine.OpenGL {
-	internal enum TextureMipmapModes {
+	public enum TextureMipmapModes {
 		Disabled = 0,
 		Nearest,
 		Linear

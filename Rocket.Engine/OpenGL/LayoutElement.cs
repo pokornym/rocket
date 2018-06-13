@@ -45,7 +45,7 @@ namespace Rocket.Engine.OpenGL {
 		}
 
 		public void SetPointer(int stride) {
-			GL.VertexAttribPointer(Index, Count, (VertexAttribPointerType) Type, Normalized, stride, Offset);
+			GlProtection.Protect(() => GL.VertexAttribPointer(Index, Count, (VertexAttribPointerType) Type, Normalized, stride, Offset));
 		}
 
 		public void Enable() {

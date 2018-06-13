@@ -15,9 +15,8 @@ namespace Rocket.Engine.Geometry {
 			A = a;
 			B = b;
 			C = c;
-			
 		}
-		
+
 		public IEnumerable<Triangle> BreakUp() {
 			Vector3 ab = HalfVector(A, B).Normalized();
 			Vector3 bc = HalfVector(B, C).Normalized();
@@ -28,12 +27,12 @@ namespace Rocket.Engine.Geometry {
 			yield return new Triangle(ab, bc, ac);
 			yield return new Triangle(ac, bc, C);
 		}
-		
+
 		public Triangle Reverse() => new Triangle(C, B, A);
 
 		public IEnumerator<Vector3> GetEnumerator() {
 			return Enumerator().GetEnumerator();
-			
+
 			IEnumerable<Vector3> Enumerator() {
 				yield return A;
 				yield return B;
@@ -42,11 +41,11 @@ namespace Rocket.Engine.Geometry {
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-		
+
 		public override string ToString() => $"{{A={ToString(A)}, B={ToString(B)}, C={ToString(C)}}}";
 
 		private string ToString(Vector3 v) => $"[{v.X}, {v.Y}, {v.Z}]";
-		
+
 		private static Vector3 HalfVector(Vector3 a, Vector3 b) => b + (a - b) / 2;
 
 		public bool Equals(Triangle other) {

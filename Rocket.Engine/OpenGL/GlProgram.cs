@@ -65,6 +65,7 @@ namespace Rocket.Engine.OpenGL {
 				string lderr = GL.GetProgramInfoLog(id);
 				throw new GlProgramException(this, $"Linkage failed!: {lderr}");
 			}
+
 			GL.ValidateProgram(id);
 			string cerr = GL.GetProgramInfoLog(id);
 			if (!string.IsNullOrWhiteSpace(cerr))

@@ -1,7 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 
 namespace Rocket.Engine.OpenGL {
-	internal sealed class Texture : BoundElement {
+	public sealed class Texture : BoundElement {
 		protected override int? BoundId {
 			get => _boundId;
 			set => _boundId = value;
@@ -26,17 +26,19 @@ namespace Rocket.Engine.OpenGL {
 
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int) filter);
 
-			int r = pixels.Width * pixels.Height;
-			byte[] buffer = new byte[r * 4];
+			byte[] buffer = new byte[pixels.Width * pixels.Height * 4];
 
 			pixels.Rewind();
-			for (int i = 0; i < r; i++) {
-				Pixel p = pixels.Read();
-				int offset = (p.X + p.Y * pixels.Width) * 4;
-				buffer[offset] = p.R;
-				buffer[offset + 1] = p.G;
-				buffer[offset + 2] = p.B;
-				buffer[offset + 3] = p.A;
+
+			for (int i = 0; i < pixels.Height; i++) {
+				for (int j = 0; j < pixels.Width; j++) {
+					Pixel p = pixels.Read();
+					int offset = (j + (pixels.Height - i - 1) * pixels.Width) * 4;
+					buffer[offset] = p.R;
+					buffer[offset + 1] = p.G;
+					buffer[offset + 2] = p.B;
+					buffer[offset + 3] = p.A;
+				}
 			}
 
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, pixels.Width, pixels.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, buffer);

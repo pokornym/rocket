@@ -47,8 +47,8 @@ namespace Rocket.Models {
 		private static IEnumerable<Triangle> Compose(Triangle t) {
 			yield return t;
 			for (int i = 1; i <= 3; i++) {
-				float cos = (float)Math.Cos(i * Math.PI / 2);
-				float sin = (float)Math.Sin(i * Math.PI / 2);
+				float cos = (float) Math.Cos(i * Math.PI / 2);
+				float sin = (float) Math.Sin(i * Math.PI / 2);
 				Vector3[] vec = t.Select(v => new Vector3(cos * v.X - sin * v.Y, sin * v.X + cos * v.Y, v.Z)).ToArray();
 				yield return new Triangle(vec[0], vec[1], vec[2]);
 			}

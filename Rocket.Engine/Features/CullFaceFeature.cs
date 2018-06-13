@@ -1,7 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 
 namespace Rocket.Engine.Features {
-	public sealed class CullFaceFeature : IFeature{
+	public sealed class CullFaceFeature : IFeature {
 		public void Attach() {
 			GL.Enable(EnableCap.CullFace);
 		}
@@ -10,12 +10,8 @@ namespace Rocket.Engine.Features {
 			GL.Disable(EnableCap.CullFace);
 		}
 
-		public void Before() {
-			
-		}
+		public void Before() { }
 
-		public void After() {
-			
-		}
+		public void After() { }
 	}
 }

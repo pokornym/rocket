@@ -21,6 +21,7 @@ namespace Rocket.Engine {
 			get => _window.Title;
 			set => _window.Title = value;
 		}
+		public TimeSpan Runtime => TimeSpan.FromMilliseconds(Environment.TickCount - _tick);
 		public float FPS => (float) _window.RenderFrequency;
 		public float UPS => (float) _window.UpdateFrequency;
 		public event EventHandler Initialize;
@@ -35,10 +36,12 @@ namespace Rocket.Engine {
 		private readonly List<FeatureHandle> _features = new List<FeatureHandle>();
 		private readonly List<ILayer> _layers = new List<ILayer>();
 		private readonly GameWindow _window;
+		private readonly int _tick;
 
 		public Window(int w = 1024, int h = 720) {
-			_window = new GameWindow(w, h, new GraphicsMode(GraphicsMode.Default.ColorFormat, GraphicsMode.Default.Depth, GraphicsMode.Default.Stencil, 16), "Game");
-			_window.VSync = VSyncMode.Adaptive;
+			_window = new GameWindow(w, h, new GraphicsMode(GraphicsMode.Default.ColorFormat, GraphicsMode.Default.Depth, GraphicsMode.Default.Stencil, 16), "Game", GameWindowFlags.Default, DisplayDevice.Default, 3, 2, GraphicsContextFlags.Debug) {
+				VSync = VSyncMode.Adaptive
+			};
 			_window.Load += (s, e) => OnInitialize();
 			_window.RenderFrame += (s, e) => {
 				OnFrame();
@@ -72,6 +75,7 @@ namespace Rocket.Engine {
 					OnKeyUp(k);
 				_keys.Clear();
 			};
+			_tick = Environment.TickCount;
 		}
 
 		public void Attach(IFeature f) {
@@ -97,7 +101,7 @@ namespace Rocket.Engine {
 			foreach (FeatureHandle h in _features.Where(i => i.Feature is T && i.Enabled))
 				h.Detach();
 		}
-		
+
 		public bool IsKey(Key k) => _keys.Contains(k);
 
 		public void AddLayer(ILayer l) {
@@ -114,7 +118,7 @@ namespace Rocket.Engine {
 		protected virtual void OnInitialize() => Initialize?.Invoke(this, null);
 
 		protected virtual void OnFrame() => Frame?.Invoke(this, null);
-		
+
 		protected virtual void OnUpdate() => Update?.Invoke(this, null);
 
 		protected virtual void OnUnitialize() => Uninitialize?.Invoke(this, null);
@@ -141,12 +145,12 @@ namespace Rocket.Engine {
 			_window.SwapBuffers();
 		}
 
-		private sealed class FeatureHandle : IFeature{
+		private sealed class FeatureHandle : IFeature {
 			public readonly IFeature Feature;
 			public bool Enabled { get; private set; }
 
 			public FeatureHandle(IFeature f) => Feature = f ?? throw new ArgumentNullException(nameof(f));
-			
+
 			public void Attach() {
 				if (Enabled)
 					return;

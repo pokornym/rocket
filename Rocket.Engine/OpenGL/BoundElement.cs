@@ -17,7 +17,7 @@ namespace Rocket.Engine.OpenGL {
 			UnbindElement();
 			BoundId = null;
 		}
-		
+
 		public BindingContext Use() => new BindingContext(this);
 
 		public void Use(Action f) {

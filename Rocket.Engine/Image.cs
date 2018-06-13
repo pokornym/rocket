@@ -49,7 +49,7 @@ namespace Rocket.Engine {
 					ret._data[i, j] = _data[i + x, j + y];
 			return ret;
 		}
-		
+
 		public Color this[int x, int y] {
 			get => _data[x, y];
 			set => _data[x, y] = value;

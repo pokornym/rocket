@@ -6,8 +6,10 @@ using OpenTK.Input;
 using Rocket.Engine;
 using Rocket.Engine.Features;
 using Rocket.Engine.OpenGL;
+using Rocket.Engine.Text;
 using Rocket.Models;
 using Rocket.Render;
+using Rocket.Render.Gui;
 using Rocket.Render.Layers;
 using Rocket.World;
 using Rocket.World.Objects;
@@ -17,7 +19,12 @@ namespace Rocket {
 		private const int TARGET_FPS = 60;
 		private const int TARGET_UPS = 30;
 		private const int SPHERE_BREAKUPS = 1;
+		private const string ASSETS_DIR = "assets";
+		private const string FONT_DIR = "font";
+		private const string FONT_FILE = "vcr-osd-mono.fnt";
 		private const string SHADERS_DIR = "shaders";
+		private const string WORLD_SHADERS = "world";
+		private const string GUI_SHADERS = "gui";
 		private const float ROTATION_TORQUE = 1f;
 		private const float STABILIZATION_TORQUE = 5f;
 		private const float BOOSTER_FORCE = 10f;
@@ -28,11 +35,21 @@ namespace Rocket {
 		private OrbitalCamera _cam;
 		private SceneLayer _layer;
 		private int _tick = Environment.TickCount;
+		private readonly Label _tutorialLbl = new Label {
+			X = 32,
+			Y = 32,
+			Text =
+				"Newbie tutorial:" + Environment.NewLine +
+				"W, A, S, D - rotation controls" + Environment.NewLine +
+				"Up, Left, Down, Right - camera controls" + Environment.NewLine +
+				"X - rotation stabilization" + Environment.NewLine +
+				"Space - thrust"
+		};
 
 		public RocketGame(string[] args) {
 			Attach(new BlendingFeature());
 			Attach(new DepthFeature());
-			//Attach(new CullFaceFeature());
+			Attach(new TexturesFeature());
 			Title = "Rocket";
 		}
 
@@ -43,9 +60,14 @@ namespace Rocket {
 		protected override void OnInitialize() {
 			SphereModel sphere = new SphereModel(_coder, SPHERE_BREAKUPS);
 
-			GlProgram program = new GlProgram(
-				new Shader(ShaderTypes.Vertex, File.ReadAllText(Path.Combine(SHADERS_DIR, "vertex.glsl"))),
-				new Shader(ShaderTypes.Fragment, File.ReadAllText(Path.Combine(SHADERS_DIR, "fragment.glsl")))
+			GlProgram wProgram = new GlProgram(
+				new Shader(ShaderTypes.Vertex, File.ReadAllText(Path.Combine(SHADERS_DIR, WORLD_SHADERS, "vertex.glsl"))),
+				new Shader(ShaderTypes.Fragment, File.ReadAllText(Path.Combine(SHADERS_DIR, WORLD_SHADERS, "fragment.glsl")))
+			);
+
+			GlProgram gProgram = new GlProgram(
+				new Shader(ShaderTypes.Vertex, File.ReadAllText(Path.Combine(SHADERS_DIR, GUI_SHADERS, "vertex.glsl"))),
+				new Shader(ShaderTypes.Fragment, File.ReadAllText(Path.Combine(SHADERS_DIR, GUI_SHADERS, "fragment.glsl")))
 			);
 
 			_universe.Add(new SpaceObject(2, 100000, sphere) { Position = new Vector3(0, 0, 0) });
@@ -53,11 +75,15 @@ namespace Rocket {
 			_universe.Add(new SpaceObject(0, 250, sphere) { Position = new Vector3(500, -500, 0), Velocity = new Vector3(30f, 0, 5f) });
 			_universe.Add(_rocket = new RocketObject(55, new RocketModel(_coder)) { Position = new Vector3(500, 500, 500), Velocity = new Vector3(-30f, 0f, 0f) });
 
-			RenderHandle handle = new RenderHandle(this, program);
+			RenderHandle handle = new RenderHandle(this, wProgram);
 			_layer = new SceneLayer(_universe, handle);
 			AddLayer(_layer);
 			_cam = new OrbitalCamera(_layer.Camera) { Distance = 250 };
-			AddLayer(new FuelLayer(_rocket, handle, new RectangleModel(_coder)));
+			Font fnt = new Font(Path.Combine(ASSETS_DIR, FONT_DIR, FONT_FILE));
+			AddLayer(new GuiFuelLayer(_rocket, this, gProgram, new GuiVertexCoder(), fnt));
+			GuiLayer tutorial = new GuiLayer(this, gProgram, new GuiVertexCoder(), fnt);
+			tutorial.Add(_tutorialLbl);
+			AddLayer(tutorial);
 			Background = new Color(50, 50, 50, 255);
 			base.OnInitialize();
 		}
@@ -100,6 +126,8 @@ namespace Rocket {
 				_universe.TimeWrap++;
 			else if (IsKey(Key.KeypadMinus))
 				_universe.TimeWrap--;
+
+			_tutorialLbl.IsVisible = Runtime.TotalSeconds < 30;
 
 			_universe.Tick();
 

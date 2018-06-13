@@ -88,8 +88,6 @@ namespace Rocket.Engine.OpenGL {
 				set = null;
 				return false;
 			}
-
-
 		}
 	}
 }

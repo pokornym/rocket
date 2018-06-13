@@ -34,7 +34,7 @@ namespace Rocket.Render {
 			_uShade = program.GetUniform(UNIFORM_SHADE);
 			_uMaterial = new MaterialUniform(program.GetUniform($"{UNIFORM_MATERIAL}.ambient"), program.GetUniform($"{UNIFORM_MATERIAL}.diffusion"), program.GetUniform($"{UNIFORM_MATERIAL}.color"));
 			_uLightCount = program.GetUniform(UNIFORM_LIGHT_COUNT);
-			
+
 			for (uint i = 0; i < LIGHT_LIMIT; i++)
 				_uLight[i] = new LightUniform(program.GetUniform($"{UNIFORM_LIGHT}[{i}].position"), program.GetUniform($"{UNIFORM_LIGHT}[{i}].color"), program.GetUniform($"{UNIFORM_LIGHT}[{i}].intensity"));
 
@@ -56,6 +56,7 @@ namespace Rocket.Render {
 					throw new OutOfMemoryException("Too many lights!");
 				_uLight[i++].Set(l);
 			}
+
 			_uLightCount.Set(i);
 		}
 
@@ -81,7 +82,7 @@ namespace Rocket.Render {
 				_position = pos ?? throw new ArgumentNullException(nameof(pos));
 				_color = col ?? throw new ArgumentNullException(nameof(col));
 				_intensity = its ?? throw new ArgumentNullException(nameof(its));
-				
+
 				_position.EnsureType(Vec4);
 				_color.EnsureType(Vec3);
 				_intensity.EnsureType(Float);

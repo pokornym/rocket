@@ -20,38 +20,38 @@ namespace Rocket.World {
 		public void Tick() {
 			float delta = _stz.GetDelta();
 			for (int i = 0; i < TimeWrap; i++)
-			for (int j = _objects.Count - 1; j >= 0; j--) {
-				WorldObject obj = _objects[j];
-				if (!obj.Tick()) {
-					_objects.RemoveAt(j);
-					continue;
-				}
-
-				// Gravity and collisions
-				Vector3 accel = (obj.Force / obj.Mass);
-				bool col = false;
-				foreach (WorldObject g in _objects) {
-					if (g == obj)
+				for (int j = _objects.Count - 1; j >= 0; j--) {
+					WorldObject obj = _objects[j];
+					if (!obj.Tick()) {
+						_objects.RemoveAt(j);
 						continue;
-					if (g.Bulk && (!obj.Bulk || obj.Mass <= g.Mass) && obj.IsCollision(g)) {
-						g.OnCollision(obj);
-						col = true;
 					}
 
-					accel += Gravity(obj, g);
-				}
+					// Gravity and collisions
+					Vector3 accel = (obj.Force / obj.Mass);
+					bool col = false;
+					foreach (WorldObject g in _objects) {
+						if (g == obj)
+							continue;
+						if (g.Bulk && (!obj.Bulk || obj.Mass <= g.Mass) && obj.IsCollision(g)) {
+							g.OnCollision(obj);
+							col = true;
+						}
 
-				if (col) {
-					_objects.RemoveAt(j);
-					continue;
-				}
+						accel += Gravity(obj, g);
+					}
 
-				// Dynamics
-				obj.Velocity += accel * delta;
-				obj.Position += obj.Velocity * delta;
-				obj.AngularMomentum += obj.Torque / obj.Mass;
-				obj.Rotation += obj.AngularMomentum;
-			}
+					if (col) {
+						_objects.RemoveAt(j);
+						continue;
+					}
+
+					// Dynamics
+					obj.Velocity += accel * delta;
+					obj.Position += obj.Velocity * delta;
+					obj.AngularMomentum += obj.Torque / obj.Mass;
+					obj.Rotation += obj.AngularMomentum;
+				}
 		}
 
 		private static Vector3 Gravity(WorldObject from, WorldObject to) {

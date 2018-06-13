@@ -5,15 +5,13 @@ using Rocket.Engine.OpenGL;
 
 namespace Rocket.Render {
 	internal sealed class VertexCoder : IVertexCoder<Vertex> {
-		public const int SIZE = sizeof(float) * 8 + sizeof(byte) * 4;
-		
+		public const int SIZE = sizeof(float) * 3 * 2;
+
 		public VertexLayout Layout { get; }
 
 		public VertexCoder() {
 			Layout = new VertexLayout();
 			Layout.AddFloat("Position", 3);
-			Layout.AddByte("Color", 4, true);
-			Layout.AddFloat("UV", 2);
 			Layout.AddFloat("Normal", 3);
 		}
 

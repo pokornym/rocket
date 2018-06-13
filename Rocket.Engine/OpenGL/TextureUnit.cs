@@ -5,7 +5,7 @@ namespace Rocket.Engine.OpenGL {
 		private readonly TextureWorkspace _ws;
 		internal readonly int Slot;
 		public bool IsDisposed { get; private set; }
-		
+
 		internal TextureUnit(TextureWorkspace ws, int slot) {
 			_ws = ws ?? throw new ArgumentNullException(nameof(ws));
 			Slot = slot;
